@@ -1,85 +1,64 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { onMounted } from 'vue'
+import { useAppStore } from '@/stores/app'
+import LoadingScreen from './components/LoadingScreen.vue'
+import AppLayout from './components/AppLayout.vue'
+import StudentModal from './components/modals/StudentModal.vue'
+import CreditModal from './components/modals/CreditModal.vue'
+import ConsumptionModal from './components/modals/ConsumptionModal.vue'
+import QuickConsumptionModal from './components/modals/QuickConsumptionModal.vue'
+import MessageModal from './components/modals/MessageModal.vue'
+import WeeklyHistoryModal from './components/modals/WeeklyHistoryModal.vue'
+
+const store = useAppStore()
+
+onMounted(() => {
+  store.initializeApp()
+})
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <div class="app-container">
+    <!-- Tela de carregamento -->
+    <LoadingScreen v-if="store.isLoading" />
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+    <!-- Layout principal -->
+    <AppLayout v-else />
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
+    <!-- Modais -->
+    <StudentModal
+      v-if="store.modal.isOpen && store.modal.type === 'addStudent'"
+      @close="store.closeModal"
+    />
 
-  <RouterView />
+    <CreditModal
+      v-if="store.modal.isOpen && store.modal.type === 'addCredit'"
+      :student="store.modal.data"
+      @close="store.closeModal"
+    />
+
+    <ConsumptionModal
+      v-if="store.modal.isOpen && store.modal.type === 'consumption'"
+      :student="store.modal.data"
+      @close="store.closeModal"
+    />
+
+    <QuickConsumptionModal
+      v-if="store.modal.isOpen && store.modal.type === 'quickConsumption'"
+      :student="store.modal.data"
+      @close="store.closeModal"
+    />
+
+    <MessageModal
+      v-if="store.modal.isOpen && store.modal.type === 'message'"
+      :message="store.modal.data.message"
+      :phone="store.modal.data.phone"
+      @close="store.closeModal"
+    />
+
+    <WeeklyHistoryModal
+      v-if="store.modal.isOpen && store.modal.type === 'weeklyHistory'"
+      @close="store.closeModal"
+    />
+  </div>
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-</style>
