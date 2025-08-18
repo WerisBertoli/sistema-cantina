@@ -1,10 +1,27 @@
 <template>
-  <div class="flex flex-col h-screen">
+  <div 
+    class="flex flex-col h-screen"
+    @touchstart="handleTouchStart"
+    @touchmove="handleTouchMove"
+    @touchend="handleTouchEnd"
+  >
     <!-- Header -->
     <header class="modern-header relative px-3 sm:px-4 py-6 sm:py-8">
       <div class="flex items-center justify-between relative z-10">
-        <!-- Logo da Escola -->
-        <div class="flex items-center">
+        <!-- Botão Voltar (quando há estudante selecionado) - Posicionado à esquerda -->
+        <button
+          v-if="store.currentStudent"
+          @click="store.setCurrentStudent(null)"
+          class="modern-back-button flex items-center px-3 py-2 rounded-lg transition-all duration-300"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+          </svg>
+          <span class="text-sm sm:text-base">Voltar</span>
+        </button>
+        
+        <!-- Logo da Escola (quando não há estudante selecionado) -->
+        <div v-if="!store.currentStudent" class="flex items-center">
           <img 
             src="/logo-erlach.png" 
             alt="Logo Centro Educacional Erlach" 
@@ -12,16 +29,9 @@
             style="background: transparent; mix-blend-mode: multiply;"
           />
         </div>
-
-        <!-- Botão Voltar (quando há estudante selecionado) -->
-        <button
-          v-if="store.currentStudent"
-          @click="store.setCurrentStudent(null)"
-          class="modern-back-button flex items-center px-3 py-2 rounded-lg transition-all duration-300"
-        >
-          <!-- SVG removido -->
-          <span class="text-sm sm:text-base">Voltar</span>
-        </button>
+        
+        <!-- Espaçador quando há estudante selecionado -->
+        <div v-if="store.currentStudent" class="flex-1"></div>
 
         <!-- Toggle Dark Mode -->
         <button
@@ -88,12 +98,53 @@ import BottomNavigation from '@/components/BottomNavigation.vue'
 
 const store = useAppStore()
 
+// Swipe navigation variables
+const touchStartX = ref(0)
+const touchStartY = ref(0)
+const touchEndX = ref(0)
+const touchEndY = ref(0)
+const minSwipeDistance = 50
+const maxVerticalDistance = 100
+
 // const currentTitle = computed(() => {
 //   if (store.currentStudent) {
 //     return store.currentStudent.name
 //   }
 //   return store.activeTab === 'students' ? 'Cantina Digital' : 'Ganhos'
 // })
+
+// Swipe navigation functions
+const handleTouchStart = (e: TouchEvent) => {
+  touchStartX.value = e.touches[0].clientX
+  touchStartY.value = e.touches[0].clientY
+}
+
+const handleTouchMove = (e: TouchEvent) => {
+  // Prevent default scrolling behavior during swipe
+  const deltaX = e.touches[0].clientX - touchStartX.value
+  const deltaY = Math.abs(e.touches[0].clientY - touchStartY.value)
+  
+  // If it's a horizontal swipe (more horizontal than vertical movement)
+  if (Math.abs(deltaX) > deltaY && Math.abs(deltaX) > 20) {
+    e.preventDefault()
+  }
+}
+
+const handleTouchEnd = (e: TouchEvent) => {
+  touchEndX.value = e.changedTouches[0].clientX
+  touchEndY.value = e.changedTouches[0].clientY
+  
+  const deltaX = touchEndX.value - touchStartX.value
+  const deltaY = Math.abs(touchEndY.value - touchStartY.value)
+  
+  // Check if it's a valid swipe gesture
+  if (Math.abs(deltaX) > minSwipeDistance && deltaY < maxVerticalDistance) {
+    // Swipe right (go back)
+    if (deltaX > 0 && store.currentStudent) {
+      store.setCurrentStudent(null)
+    }
+  }
+}
 
 // Dark mode functionality
 const isDarkMode = ref(false)
