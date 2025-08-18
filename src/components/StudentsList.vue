@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white dark:bg-gray-900">
+  <div class="bg-white dark:bg-gray-900" style="overflow-x: hidden !important; max-width: 100vw; width: 100%;">
     <div class="px-3 pt-3 pb-2 sm:px-4 sm:pt-4 bg-white dark:bg-gray-900">
       <h2 class="modern-title text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-blue-600 dark:text-blue-400 text-center">
         Lista de Alunos
@@ -61,17 +61,17 @@
 
     <!-- Layout para Desktop (Tabela) -->
     <div class="hidden sm:block bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full divide-y divide-gray-200 dark:divide-gray-600">
+      <div class="overflow-x-hidden" style="overflow-x: hidden !important; max-width: 100%; width: 100%;">
+        <table class="w-full divide-y divide-gray-200 dark:divide-gray-600 table-fixed" style="table-layout: fixed; width: 100%; max-width: 100%;">
         <thead>
           <tr class="bg-blue-600 dark:bg-blue-700">
-            <th class="px-4 py-3 text-left text-sm font-semibold text-white tracking-wide">
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white tracking-wide w-1/2">
               Nome
             </th>
-            <th class="px-4 py-3 text-left text-sm font-semibold text-white tracking-wide">
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white tracking-wide w-1/4">
               Saldo
             </th>
-            <th class="px-4 py-3 text-right text-sm font-semibold text-white tracking-wide">
+            <th class="px-4 py-3 text-right text-sm font-semibold text-white tracking-wide w-1/4">
               Ações
             </th>
           </tr>
@@ -88,7 +88,7 @@
              ]"
             @click="selectStudent(student)"
           >
-            <td class="px-4 py-4 whitespace-nowrap">
+            <td class="px-4 py-4 w-1/2" style="max-width: 50%; overflow: hidden; word-wrap: break-word;">
               <div class="flex items-center">
                 <div class="flex-1 min-w-0">
                   <div class="font-semibold text-sm text-gray-900 dark:text-white truncate">
@@ -100,7 +100,7 @@
                 </div>
               </div>
             </td>
-            <td class="px-4 py-4 whitespace-nowrap">
+            <td class="px-4 py-4 w-1/4" style="max-width: 25%; overflow: hidden;">
               <div class="flex items-center space-x-2">
                 <div class="flex-shrink-0">
                   <div :class="[
@@ -108,12 +108,12 @@
                     student.balance >= 15 ? 'bg-green-400' : student.balance >= 12 ? 'bg-yellow-400' : 'bg-red-400'
                   ]"></div>
                 </div>
-                <span :class="getBalanceClass(student.balance)" class="font-semibold text-sm">
+                <span :class="getBalanceClass(student.balance)" class="font-semibold text-sm truncate">
                   {{ store.formatCurrency(student.balance) }}
                 </span>
               </div>
             </td>
-            <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <td class="px-4 py-4 w-1/4 text-right text-sm font-medium" style="max-width: 25%; overflow: hidden;">
               <button 
                 @click.stop="store.openModal('consumption', student)"
                 class="compact-action-button"
