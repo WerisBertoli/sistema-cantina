@@ -4,6 +4,7 @@ import { useAppStore } from '@/stores/app'
 import LoadingScreen from './components/LoadingScreen.vue'
 import AppLayout from './components/AppLayout.vue'
 import StudentModal from './components/modals/StudentModal.vue'
+import EditStudentModal from './components/modals/EditStudentModal.vue'
 import CreditModal from './components/modals/CreditModal.vue'
 import ConsumptionModal from './components/modals/ConsumptionModal.vue'
 import QuickConsumptionModal from './components/modals/QuickConsumptionModal.vue'
@@ -28,6 +29,11 @@ onMounted(() => {
     <!-- Modais -->
     <StudentModal
       v-if="store.modal.isOpen && store.modal.type === 'addStudent'"
+      @close="store.closeModal"
+    />
+
+    <EditStudentModal
+      v-if="store.modal.isOpen && store.modal.type === 'editStudent'"
       @close="store.closeModal"
     />
 

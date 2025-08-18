@@ -1,86 +1,127 @@
 <template>
   <div class="modal-overlay" @click="store.closeModal()">
     <div class="modal-content-large max-h-[90vh] overflow-y-auto" @click.stop>
-      <div class="flex justify-between items-center mb-4 sm:mb-6 bg-white dark:bg-gray-800 pb-3 sm:pb-4 border-b border-gray-200 dark:border-gray-600">
-        <h2 class="text-lg sm:text-2xl font-semibold text-gray-800 dark:text-white">Registrar Consumo</h2>
-        <button @click="store.closeModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+      <div
+        class="flex justify-between items-center mb-4 sm:mb-6 bg-white dark:bg-gray-800 pb-3 sm:pb-4 border-b border-gray-200 dark:border-gray-600"
+      >
+        <h2 class="text-lg sm:text-2xl font-semibold text-gray-800 dark:text-white">
+          Registrar Consumo
+        </h2>
+        <button
+          @click="store.closeModal()"
+          class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        >
           <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
           </svg>
         </button>
       </div>
-      
-      <div class="mb-4 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-xl border border-blue-100 dark:border-blue-800">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+
+      <div
+        class="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50 dark:bg-blue-900 rounded-xl border border-blue-100 dark:border-blue-800"
+      >
+        <div
+          class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0"
+        >
           <div>
             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Aluno:</p>
-            <p class="font-semibold text-base sm:text-lg text-gray-800 dark:text-white truncate">{{ currentStudent?.name }}</p>
+            <p class="font-semibold text-base sm:text-lg text-gray-800 dark:text-white truncate">
+              {{ currentStudent?.name }}
+            </p>
           </div>
           <div class="text-left sm:text-right">
             <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Saldo atual:</p>
-            <p class="font-bold text-lg sm:text-xl" :class="getBalanceClass(currentStudent?.balance || 0)">
+            <p
+              class="font-bold text-lg sm:text-xl"
+              :class="getBalanceClass(currentStudent?.balance || 0)"
+            >
               {{ store.formatCurrency(currentStudent?.balance || 0) }}
             </p>
           </div>
         </div>
       </div>
-      
+
       <!-- Grid de Produtos -->
       <div class="mb-6">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Produtos Disponíveis ({{ store.products.length }})</h3>
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+            Produtos Disponíveis ({{ store.products.length }})
+          </h3>
         </div>
-        
+
         <div class="product-grid">
-          <div 
-            v-for="product in store.products" 
-            :key="product.id"
-            class="product-card"
-          >
+          <div v-for="product in store.products" :key="product.id" class="product-card">
             <div class="product-image">
-              <img 
-                v-if="product.imageUrl" 
-                :src="product.imageUrl" 
+              <img
+                v-if="product.imageUrl"
+                :src="product.imageUrl"
                 :alt="product.name"
                 class="product-image-real"
-                @error="(e) => { console.log('Erro ao carregar imagem:', product.name, product.imageUrl); const target = e.target as HTMLImageElement; if (target) { target.style.display = 'none'; const sibling = target.nextElementSibling as HTMLElement; if (sibling) sibling.style.display = 'flex'; } }"
-                @load="console.log('✅ Imagem carregada com sucesso:', product.name, product.imageUrl)"
+                @error="
+                  (e) => {
+                    console.log('Erro ao carregar imagem:', product.name, product.imageUrl)
+                    const target = e.target as HTMLImageElement
+                    if (target) {
+                      target.style.display = 'none'
+                      const sibling = target.nextElementSibling as HTMLElement
+                      if (sibling) sibling.style.display = 'flex'
+                    }
+                  }
+                "
+                @load="
+                  console.log('✅ Imagem carregada com sucesso:', product.name, product.imageUrl)
+                "
               />
-              <div class="image-placeholder" :style="{ display: product.imageUrl ? 'none' : 'flex' }">
-                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              <div
+                class="image-placeholder"
+                :style="{ display: product.imageUrl ? 'none' : 'flex' }"
+              >
+                <svg
+                  class="w-8 h-8 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  ></path>
                 </svg>
               </div>
-              
+
               <!-- Quantidade no carrinho -->
               <div v-if="getCartQuantity(product) > 0" class="quantity-badge">
                 {{ getCartQuantity(product) }}
               </div>
             </div>
-            
+
             <div class="product-info">
               <h4 class="product-name">{{ product.name }}</h4>
               <p class="product-price">{{ store.formatCurrency(product.price) }}</p>
             </div>
-            
+
             <div class="product-actions">
-              <button 
+              <button
                 @click="removeFromCart(product)"
                 :disabled="getCartQuantity(product) === 0"
                 class="button-3d remove-btn"
-                :class="{ 'disabled': getCartQuantity(product) === 0 }"
+                :class="{ disabled: getCartQuantity(product) === 0 }"
               >
                 <div class="button-top">
                   <span class="material-icons">−</span>
                 </div>
               </button>
-              
+
               <span class="quantity-display">{{ getCartQuantity(product) }}</span>
-              
-              <button 
-                @click="addToCart(product)"
-                class="button-3d add-btn"
-              >
+
+              <button @click="addToCart(product)" class="button-3d add-btn">
                 <div class="button-top">
                   <span class="material-icons">+</span>
                 </div>
@@ -89,36 +130,44 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Resumo do Carrinho -->
       <div v-if="store.cartTotal > 0" class="mb-4 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
         <h4 class="font-medium mb-2 dark:text-white">Resumo do Pedido</h4>
         <div class="space-y-1 text-sm">
           <div v-for="item in store.cart" :key="item.product.id" class="flex justify-between">
             <span class="dark:text-gray-200">{{ item.quantity }}x {{ item.product.name }}</span>
-            <span class="dark:text-gray-200">{{ store.formatCurrency(item.quantity * item.product.price) }}</span>
+            <span class="dark:text-gray-200">{{
+              store.formatCurrency(item.quantity * item.product.price)
+            }}</span>
           </div>
         </div>
-        <div class="border-t border-blue-200 dark:border-blue-700 mt-2 pt-2 flex justify-between font-medium">
+        <div
+          class="border-t border-blue-200 dark:border-blue-700 mt-2 pt-2 flex justify-between font-medium"
+        >
           <span class="dark:text-white">Total:</span>
           <span class="dark:text-white">{{ store.formatCurrency(store.cartTotal) }}</span>
         </div>
-        
-        <div class="mt-2 p-2 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-700 dark:to-purple-700 border border-white/10 dark:border-white/20 shadow-[0_8px_32px_rgba(79,70,229,0.3)] dark:shadow-[0_8px_32px_rgba(99,102,241,0.4)]">
+
+        <div
+          class="mt-2 p-2 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 dark:from-blue-600 dark:to-cyan-600 border border-white/10 dark:border-white/20 shadow-[0_8px_32px_rgba(59,130,246,0.25)] dark:shadow-[0_8px_32px_rgba(59,130,246,0.3)]"
+        >
           <p class="text-sm text-white/90">Novo saldo:</p>
           <p class="font-medium text-white">{{ store.formatCurrency(newBalance) }}</p>
         </div>
       </div>
-      
-      <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800">
-        <button 
+
+      <div
+        class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800"
+      >
+        <button
           type="button"
           @click="store.closeModal()"
           class="new-cancel-button w-full sm:w-auto order-2 sm:order-1"
         >
           Cancelar
         </button>
-        <button 
+        <button
           @click="handleSubmit"
           :disabled="isSubmitting || store.cartTotal === 0 || newBalance < 0"
           class="new-confirm-button w-full sm:w-auto order-1 sm:order-2"
@@ -157,21 +206,21 @@ const getBalanceClass = (balance: number) => {
   return {
     'text-green-600': status === BalanceStatus.NORMAL,
     'text-yellow-600': status === BalanceStatus.LOW,
-    'text-red-600': status === BalanceStatus.CRITICAL
+    'text-red-600': status === BalanceStatus.CRITICAL,
   }
 }
 
-const getNewBalanceClass = () => {
-  const status = store.getBalanceStatus(newBalance.value)
-  return {
-    'bg-green-100 text-green-800': status === BalanceStatus.NORMAL,
-    'bg-yellow-100 text-yellow-800': status === BalanceStatus.LOW,
-    'bg-red-100 text-red-800': status === BalanceStatus.CRITICAL
-  }
-}
+// const getNewBalanceClass = () => {
+//   const status = store.getBalanceStatus(newBalance.value)
+//   return {
+//     'bg-green-100 text-green-800': status === BalanceStatus.NORMAL,
+//     'bg-yellow-100 text-yellow-800': status === BalanceStatus.LOW,
+//     'bg-red-100 text-red-800': status === BalanceStatus.CRITICAL
+//   }
+// }
 
 const getCartQuantity = (product: Product) => {
-  const item = store.cart.find(item => item.product.id === product.id)
+  const item = store.cart.find((item) => item.product.id === product.id)
   return item ? item.quantity : 0
 }
 
@@ -185,12 +234,12 @@ const removeFromCart = (product: Product) => {
 
 const handleSubmit = async () => {
   if (isSubmitting.value || !currentStudent.value || store.cartTotal === 0) return
-  
+
   if (newBalance.value < 0) {
     alert('Saldo insuficiente para esta compra!')
     return
   }
-  
+
   isSubmitting.value = true
   try {
     await store.processConsumption(currentStudent.value.id!)

@@ -10,9 +10,7 @@ import {
   onSnapshot,
   query,
   orderBy,
-  where,
   Timestamp,
-  getDocs
 } from 'firebase/firestore'
 import { db, signInAnonymous } from '@/firebase'
 
@@ -32,14 +30,15 @@ export const useAppStore = defineStore('app', () => {
   // Computed
   const filteredStudents = computed(() => {
     if (!searchQuery.value) return students.value
-    return students.value.filter(student =>
-      (student.name?.toLowerCase() || '').includes(searchQuery.value.toLowerCase()) ||
-      (student.parentName?.toLowerCase() || '').includes(searchQuery.value.toLowerCase())
+    return students.value.filter(
+      (student) =>
+        (student.name?.toLowerCase() || '').includes(searchQuery.value.toLowerCase()) ||
+        (student.parentName?.toLowerCase() || '').includes(searchQuery.value.toLowerCase()),
     )
   })
 
   const cartTotal = computed(() => {
-    return cart.value.reduce((total, item) => total + (item.product.price * item.quantity), 0)
+    return cart.value.reduce((total, item) => total + item.product.price * item.quantity, 0)
   })
 
   const earnings = computed((): Earnings => {
@@ -49,18 +48,18 @@ export const useAppStore = defineStore('app', () => {
     startOfWeek.setDate(today.getDate() - today.getDay())
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
-    const creditTransactions = transactions.value.filter(t => t.type === 'credit')
+    const creditTransactions = transactions.value.filter((t) => t.type === 'credit')
 
     return {
       today: creditTransactions
-        .filter(t => t.date.toDate() >= today)
+        .filter((t) => t.date.toDate() >= today)
         .reduce((sum, t) => sum + t.value, 0),
       thisWeek: creditTransactions
-        .filter(t => t.date.toDate() >= startOfWeek)
+        .filter((t) => t.date.toDate() >= startOfWeek)
         .reduce((sum, t) => sum + t.value, 0),
       thisMonth: creditTransactions
-        .filter(t => t.date.toDate() >= startOfMonth)
-        .reduce((sum, t) => sum + t.value, 0)
+        .filter((t) => t.date.toDate() >= startOfMonth)
+        .reduce((sum, t) => sum + t.value, 0),
     }
   })
 
@@ -74,7 +73,7 @@ export const useAppStore = defineStore('app', () => {
   const formatCurrency = (value: number): string => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'BRL',
     }).format(value)
   }
 
@@ -83,26 +82,27 @@ export const useAppStore = defineStore('app', () => {
     try {
       isLoading.value = true
       console.log('🔄 Iniciando aplicação...')
-      
+
       // Tentar autenticação anônima, mas continuar mesmo se falhar
       try {
         console.log('🔄 Tentando login anônimo...')
         await signInAnonymous()
         console.log('✅ Login anônimo realizado com sucesso')
         isAuthenticated.value = true
-      } catch (authError: any) {
-        console.warn('⚠️ Falha na autenticação anônima:', authError?.code)
+      } catch (authError: unknown) {
+        console.warn('⚠️ Falha na autenticação anônima:', authError)
         console.warn('⚠️ Continuando sem autenticação para teste...')
         isAuthenticated.value = false
       }
-      
+
       console.log('🔄 Carregando dados...')
       await loadData()
       console.log('✅ Dados carregados com sucesso')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('❌ Erro ao inicializar app:', error)
-      console.error('❌ Código do erro:', error?.code)
-      console.error('❌ Mensagem do erro:', error?.message)
+      if (error instanceof Error) {
+        console.error('❌ Mensagem do erro:', error.message)
+      }
     } finally {
       isLoading.value = false
     }
@@ -112,14 +112,14 @@ export const useAppStore = defineStore('app', () => {
     // Carregar alunos da coleção 'alunos' (dados antigos)
     const studentsQuery = query(collection(db, 'alunos'), orderBy('nome'))
     onSnapshot(studentsQuery, (snapshot) => {
-      students.value = snapshot.docs.map(doc => {
+      students.value = snapshot.docs.map((doc) => {
         const data = doc.data()
         return {
           id: doc.id,
           name: data.nome || data.name,
           parentName: data.nomePai || data.parentName,
           parentPhone: data.telefonePai || data.parentPhone,
-          balance: data.saldo || data.balance || 0
+          balance: data.saldo || data.balance || 0,
         } as Student
       })
       console.log(`Carregados ${students.value.length} alunos da coleção 'alunos'`)
@@ -128,51 +128,54 @@ export const useAppStore = defineStore('app', () => {
     // Carregar produtos da coleção 'produtos' (dados antigos)
     const productsQuery = query(collection(db, 'produtos'), orderBy('nome'))
     onSnapshot(productsQuery, async (snapshot) => {
-      products.value = snapshot.docs.map(doc => {
+      products.value = snapshot.docs.map((doc) => {
         const data = doc.data()
         const product = {
           id: doc.id,
           name: data.nome || data.name,
           price: data.preco || data.price || 0,
-          imageUrl: data.imagem
+          imageUrl: data.imagem,
         } as Product
         console.log('Produto carregado:', product)
         return product
       })
 
       // Produtos carregados do Firebase
-      
+
       console.log(`Carregados ${products.value.length} produtos da coleção 'produtos'`)
-      console.log('Produtos com imagens:', products.value.filter(p => p.imageUrl))
+      console.log(
+        'Produtos com imagens:',
+        products.value.filter((p) => p.imageUrl),
+      )
       console.log('Todos os produtos:', products.value)
     })
 
     // Carregar transações
-    const transactionsQuery = query(
-      collection(db, 'transactions'),
-      orderBy('date', 'desc')
-    )
+    const transactionsQuery = query(collection(db, 'transactions'), orderBy('date', 'desc'))
     onSnapshot(transactionsQuery, (snapshot) => {
-      transactions.value = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as Transaction))
+      transactions.value = snapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as Transaction,
+      )
     })
   }
 
-  const createSampleProducts = async () => {
-    const sampleProducts = [
-      { name: 'Suco Natural', price: 4.50 },
-      { name: 'Sanduíche', price: 8.00 },
-      { name: 'Água', price: 2.00 },
-      { name: 'Refrigerante', price: 3.50 },
-      { name: 'Bolo', price: 5.00 }
-    ]
+  // const createSampleProducts = async () => {
+  //   const sampleProducts = [
+  //     { name: 'Suco Natural', price: 4.5 },
+  //     { name: 'Sanduíche', price: 8.0 },
+  //     { name: 'Água', price: 2.0 },
+  //     { name: 'Refrigerante', price: 3.5 },
+  //     { name: 'Bolo', price: 5.0 },
+  //   ]
 
-    for (const product of sampleProducts) {
-      await addDoc(collection(db, 'produtos'), product)
-    }
-  }
+  //   for (const product of sampleProducts) {
+  //     await addDoc(collection(db, 'produtos'), product)
+  //   }
+  // }
 
   const addStudent = async (studentData: Omit<Student, 'id'>) => {
     try {
@@ -182,7 +185,7 @@ export const useAppStore = defineStore('app', () => {
         nomePai: studentData.parentName,
         telefonePai: studentData.parentPhone,
         saldo: studentData.balance || 0,
-        dataCriacao: Timestamp.now()
+        dataCriacao: Timestamp.now(),
       }
       await addDoc(collection(db, 'alunos'), firebaseData)
       closeModal()
@@ -192,16 +195,35 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  const updateStudent = async (
+    studentId: string,
+    studentData: Partial<Pick<Student, 'name' | 'parentName' | 'parentPhone'>>,
+  ) => {
+    try {
+      // Converter para os nomes de campos do Firebase
+      const firebaseData: Record<string, string> = {}
+      if (studentData.name !== undefined) firebaseData.nome = studentData.name
+      if (studentData.parentName !== undefined) firebaseData.nomePai = studentData.parentName
+      if (studentData.parentPhone !== undefined) firebaseData.telefonePai = studentData.parentPhone
+
+      await updateDoc(doc(db, 'alunos', studentId), firebaseData)
+      closeModal()
+    } catch (error) {
+      console.error('Erro ao atualizar aluno:', error)
+      throw error
+    }
+  }
+
   const addCredit = async (studentId: string, amount: number) => {
     try {
-      const student = students.value.find(s => s.id === studentId)
+      const student = students.value.find((s) => s.id === studentId)
       if (!student) throw new Error('Aluno não encontrado')
 
       const newBalance = student.balance + amount
 
       // Atualizar saldo do aluno (usando campo 'saldo' do Firebase)
       await updateDoc(doc(db, 'alunos', studentId), {
-        saldo: newBalance
+        saldo: newBalance,
       })
 
       // Atualizar saldo local imediatamente
@@ -212,7 +234,7 @@ export const useAppStore = defineStore('app', () => {
         studentId,
         type: 'credit',
         value: amount,
-        date: Timestamp.now()
+        date: Timestamp.now(),
       })
 
       closeModal()
@@ -222,9 +244,14 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
-  const editCreditTransaction = async (transactionId: string, oldAmount: number, newAmount: number, studentId: string) => {
+  const editCreditTransaction = async (
+    transactionId: string,
+    oldAmount: number,
+    newAmount: number,
+    studentId: string,
+  ) => {
     try {
-      const student = students.value.find(s => s.id === studentId)
+      const student = students.value.find((s) => s.id === studentId)
       if (!student) throw new Error('Aluno não encontrado')
 
       const amountDifference = newAmount - oldAmount
@@ -232,7 +259,7 @@ export const useAppStore = defineStore('app', () => {
 
       // Atualizar saldo do aluno
       await updateDoc(doc(db, 'alunos', studentId), {
-        saldo: newBalance
+        saldo: newBalance,
       })
 
       // Atualizar saldo local imediatamente
@@ -241,7 +268,7 @@ export const useAppStore = defineStore('app', () => {
       // Atualizar transação
       await updateDoc(doc(db, 'transactions', transactionId), {
         value: newAmount,
-        editedAt: Timestamp.now()
+        editedAt: Timestamp.now(),
       })
 
       closeModal()
@@ -253,7 +280,7 @@ export const useAppStore = defineStore('app', () => {
 
   const processConsumption = async (studentId: string) => {
     try {
-      const student = students.value.find(s => s.id === studentId)
+      const student = students.value.find((s) => s.id === studentId)
       if (!student) throw new Error('Aluno não encontrado')
 
       const total = cartTotal.value
@@ -265,18 +292,18 @@ export const useAppStore = defineStore('app', () => {
 
       // Atualizar saldo do aluno (usando campo 'saldo' do Firebase)
       await updateDoc(doc(db, 'alunos', studentId), {
-        saldo: newBalance
+        saldo: newBalance,
       })
 
       // Atualizar saldo local imediatamente
       student.balance = newBalance
 
       // Criar transação
-      const items = cart.value.map(item => ({
+      const items = cart.value.map((item) => ({
         productId: item.product.id!,
         productName: item.product.name,
         quantity: item.quantity,
-        price: item.product.price
+        price: item.product.price,
       }))
 
       await addDoc(collection(db, 'transactions'), {
@@ -284,7 +311,7 @@ export const useAppStore = defineStore('app', () => {
         type: 'consumption',
         value: -total,
         date: Timestamp.now(),
-        items
+        items,
       })
 
       clearCart()
@@ -297,7 +324,7 @@ export const useAppStore = defineStore('app', () => {
 
   // Ações do carrinho
   const addToCart = (product: Product) => {
-    const existingItem = cart.value.find(item => item.product.id === product.id)
+    const existingItem = cart.value.find((item) => item.product.id === product.id)
     if (existingItem) {
       existingItem.quantity++
     } else {
@@ -306,7 +333,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const removeFromCart = (productId: string) => {
-    const itemIndex = cart.value.findIndex(item => item.product.id === productId)
+    const itemIndex = cart.value.findIndex((item) => item.product.id === productId)
     if (itemIndex > -1) {
       if (cart.value[itemIndex].quantity > 1) {
         cart.value[itemIndex].quantity--
@@ -329,7 +356,7 @@ export const useAppStore = defineStore('app', () => {
     currentStudent.value = student
   }
 
-  const openModal = (type: ModalState['type'], data?: any) => {
+  const openModal = (type: ModalState['type'], data?: ModalState['data']) => {
     modal.value = { isOpen: true, type, data }
   }
 
@@ -345,11 +372,13 @@ export const useAppStore = defineStore('app', () => {
   // Funções de mensagem
   const generateLowBalanceMessage = (student: Student): string => {
     const parentName = student.parentName || 'responsável'
-    return `Olá, ${parentName}! 👋\n\n` +
-           `O saldo da cantina do(a) ${student.name} está baixo.\n\n` +
-           `💰 Saldo atual: ${formatCurrency(student.balance)}\n\n` +
-           `Para evitar que ${student.name} fique sem lanche, sugerimos uma recarga. 😊\n\n` +
-           `Cantina Digital 🏫`
+    return (
+      `Olá, ${parentName}! 👋\n\n` +
+      `O saldo da cantina do(a) ${student.name} está baixo.\n\n` +
+      `💰 Saldo atual: ${formatCurrency(student.balance)}\n\n` +
+      `Para evitar que ${student.name} fique sem lanche, sugerimos uma recarga. 😊\n\n` +
+      `Cantina Digital 🏫`
+    )
   }
 
   const generateWeeklyReport = async (student: Student): Promise<string> => {
@@ -357,7 +386,7 @@ export const useAppStore = defineStore('app', () => {
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
     const studentTransactions = transactions.value.filter(
-      t => t.studentId === student.id && t.date.toDate() >= oneWeekAgo
+      (t) => t.studentId === student.id && t.date.toDate() >= oneWeekAgo,
     )
 
     const parentName = student.parentName || 'responsável'
@@ -369,15 +398,15 @@ export const useAppStore = defineStore('app', () => {
       message += `Nenhuma movimentação nos últimos 7 dias.\n\n`
     } else {
       message += `📝 Movimentações dos últimos 7 dias:\n\n`
-      
-      studentTransactions.forEach(transaction => {
+
+      studentTransactions.forEach((transaction) => {
         const date = transaction.date.toDate().toLocaleDateString('pt-BR')
         if (transaction.type === 'credit') {
           message += `✅ ${date} - Recarga: ${formatCurrency(transaction.value)}\n`
         } else {
           message += `🛒 ${date} - Consumo: ${formatCurrency(Math.abs(transaction.value))}\n`
           if (transaction.items) {
-            message += `   Items: ${transaction.items.map(item => `${item.quantity}x ${item.productName}`).join(', ')}\n`
+            message += `   Items: ${transaction.items.map((item) => `${item.quantity}x ${item.productName}`).join(', ')}\n`
           }
         }
       })
@@ -399,17 +428,18 @@ export const useAppStore = defineStore('app', () => {
     activeTab,
     modal,
     cart,
-    
+
     // Computed
     filteredStudents,
     cartTotal,
     earnings,
-    
+
     // Funções
     getBalanceStatus,
     formatCurrency,
     initializeApp,
     addStudent,
+    updateStudent,
     addCredit,
     editCreditTransaction,
     processConsumption,
@@ -422,6 +452,6 @@ export const useAppStore = defineStore('app', () => {
     closeModal,
     setSearchQuery,
     generateLowBalanceMessage,
-    generateWeeklyReport
+    generateWeeklyReport,
   }
 })

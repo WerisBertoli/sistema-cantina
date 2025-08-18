@@ -3,10 +3,13 @@
     <!-- Saldo com design moderno -->
     <div class="balance-section">
       <div class="balance-container">
+        <div class="student-name">{{ store.currentStudent?.name || 'Aluno' }}</div>
         <div class="balance-label">Saldo Disponível</div>
         <div class="balance-value">
           <span class="currency-symbol">R$</span>
-          <span class="balance-amount">{{ (store.currentStudent?.balance || 0).toFixed(2).replace('.', ',') }}</span>
+          <span class="balance-amount">{{
+            (store.currentStudent?.balance || 0).toFixed(2).replace('.', ',')
+          }}</span>
         </div>
         <div class="balance-indicator" :class="getBalanceStatusClass()">
           <span class="indicator-dot"></span>
@@ -17,19 +20,41 @@
 
     <!-- Grid de ações -->
     <div class="actions-grid">
-      <button class="action-card credit-action" @click="store.openModal('addCredit', { student: store.currentStudent })">
+      <button
+        class="action-card credit-action"
+        @click="store.openModal('addCredit', { student: store.currentStudent })"
+      >
         <div class="action-icon credit-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14M5 12h14"/>
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M12 5v14M5 12h14" />
           </svg>
         </div>
         <span class="action-label dark:text-white">Adicionar Crédito</span>
       </button>
 
-      <button class="action-card consumption-action" @click="store.openModal('consumption', { student: store.currentStudent })">
+      <button
+        class="action-card consumption-action"
+        @click="store.openModal('consumption', { student: store.currentStudent })"
+      >
         <div class="action-icon consumption-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
           </svg>
         </div>
         <span class="action-label dark:text-white">Registrar Consumo</span>
@@ -37,19 +62,52 @@
 
       <button class="action-card history-action" @click="openWeeklyReport">
         <div class="action-icon history-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 3v5h5M3.05 13a9 9 0 1 0 1.5-5.2L3 8"/>
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M3 3v5h5M3.05 13a9 9 0 1 0 1.5-5.2L3 8" />
           </svg>
         </div>
         <span class="action-label dark:text-white">Ver Histórico</span>
       </button>
 
+      <button class="action-card edit-action" @click="openEditStudent">
+        <div class="action-icon edit-icon">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+          </svg>
+        </div>
+        <span class="action-label dark:text-white">Editar Aluno</span>
+      </button>
+
       <button class="action-card alert-action" @click="openLowBalanceAlert">
         <div class="action-icon alert-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-            <line x1="12" y1="9" x2="12" y2="13"/>
-            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+            />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
         </div>
         <span class="action-label dark:text-white">Configurar Alerta</span>
@@ -66,20 +124,24 @@ const store = useAppStore()
 // Métodos de status do saldo
 const getBalanceStatusClass = (): string => {
   const balance = store.currentStudent?.balance || 0
-  if (balance >= 20) return 'status-good'
-  if (balance >= 5) return 'status-warning'
+  if (balance >= 15) return 'status-good'
+  if (balance >= 12) return 'status-warning'
   return 'status-danger'
 }
 
 const getBalanceStatus = (): string => {
   const balance = store.currentStudent?.balance || 0
-  if (balance >= 20) return 'Adequado'
-  if (balance >= 5) return 'Baixo'
+  if (balance >= 15) return 'Adequado'
+  if (balance >= 12) return 'Baixo'
   return 'Crítico'
 }
 
 const openWeeklyReport = () => {
   store.openModal('weeklyHistory')
+}
+
+const openEditStudent = () => {
+  store.openModal('editStudent', store.currentStudent)
 }
 
 const openLowBalanceAlert = () => {
@@ -105,10 +167,6 @@ const openLowBalanceAlert = () => {
   gap: 1.5rem;
 }
 
-
-
-
-
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -120,8 +178,6 @@ const openLowBalanceAlert = () => {
   }
 }
 
-
-
 .balance-section {
   margin: 0;
   padding: 0;
@@ -129,17 +185,26 @@ const openLowBalanceAlert = () => {
 }
 
 .balance-container {
-  @apply bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-700 dark:to-purple-700;
+  @apply bg-gray-600 dark:bg-gray-700;
   border-radius: 16px;
   padding: 1.25rem 1.5rem;
   text-align: center;
-  @apply shadow-[0_8px_32px_rgba(79,70,229,0.3)] dark:shadow-[0_8px_32px_rgba(99,102,241,0.4)];
+  @apply shadow-[0_8px_32px_rgba(0,0,0,0.2)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)];
   backdrop-filter: blur(10px);
-  @apply border border-white/10 dark:border-white/20;
+  @apply border border-gray-500/50 dark:border-gray-600/50;
   position: relative;
   overflow: hidden;
   width: 100%;
+  @apply text-white;
+}
+
+.student-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  text-align: center;
   color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .balance-label {
@@ -179,10 +244,11 @@ const openLowBalanceAlert = () => {
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.2);
+  @apply bg-gray-300 dark:bg-gray-500;
   backdrop-filter: blur(10px);
   font-weight: 600;
   font-size: 0.875rem;
+  @apply text-gray-800 dark:text-white;
 }
 
 .indicator-dot {
@@ -194,8 +260,14 @@ const openLowBalanceAlert = () => {
 }
 
 @keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0.5; }
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0.5;
+  }
 }
 
 .status-good {
@@ -278,6 +350,11 @@ const openLowBalanceAlert = () => {
   color: white;
 }
 
+.edit-icon {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+}
+
 .alert-icon {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
@@ -298,13 +375,11 @@ const openLowBalanceAlert = () => {
   .student-card {
     margin: 1rem;
   }
-  
 
-  
   .balance-amount {
     font-size: 2.5rem;
   }
-  
+
   .actions-grid {
     grid-template-columns: 1fr;
     padding: 1.5rem;

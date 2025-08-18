@@ -1,9 +1,9 @@
 <template>
   <div class="menu">
-    <a 
-      href="#" 
+    <a
+      href="#"
       @click.prevent="$emit('navigate', 'students')"
-      class="link" 
+      class="link"
       :class="{ active: activeTab === 'students' }"
     >
       <span class="link-icon">
@@ -29,10 +29,10 @@
       <span class="link-title">Home</span>
     </a>
 
-    <a 
-      href="#" 
+    <a
+      href="#"
       @click.prevent="$emit('navigate', 'earnings')"
-      class="link" 
+      class="link"
       :class="{ active: activeTab === 'earnings' }"
     >
       <span class="link-icon">
@@ -45,18 +45,74 @@
           viewBox="0 0 256 256"
         >
           <rect width="256" height="256" fill="none"></rect>
-          <circle
-            cx="128"
-            cy="128"
-            r="96"
+          <rect
+            x="48"
+            y="144"
+            width="32"
+            height="64"
             fill="none"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="16"
-          ></circle>
+          ></rect>
+          <rect
+            x="112"
+            y="112"
+            width="32"
+            height="96"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="16"
+          ></rect>
+          <rect
+            x="176"
+            y="80"
+            width="32"
+            height="128"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="16"
+          ></rect>
+        </svg>
+      </span>
+      <span class="link-title">Ganhos</span>
+    </a>
+
+    <a
+      href="#"
+      @click.prevent="$emit('navigate', 'tarefas')"
+      class="link"
+      :class="{ active: activeTab === 'tarefas' }"
+    >
+      <span class="link-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          class="sm:w-6 sm:h-6"
+          fill="currentColor"
+          viewBox="0 0 256 256"
+        >
+          <rect width="256" height="256" fill="none"></rect>
+          <rect
+            x="40"
+            y="40"
+            width="176"
+            height="176"
+            rx="8"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="16"
+          ></rect>
           <polyline
-            points="168 88 128 128 104 104"
+            points="88 128 112 152 168 96"
             fill="none"
             stroke="currentColor"
             stroke-linecap="round"
@@ -65,12 +121,14 @@
           ></polyline>
         </svg>
       </span>
-      <span class="link-title">Ganhos</span>
+      <span class="link-title">Tarefas</span>
     </a>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+
 interface Props {
   activeTab: string
 }
@@ -79,6 +137,21 @@ defineProps<Props>()
 defineEmits<{
   navigate: [tab: string]
 }>()
+
+const isDarkMode = ref(false)
+
+const toggleDarkMode = () => {
+  isDarkMode.value = !isDarkMode.value
+  const htmlElement = document.documentElement
+
+  if (isDarkMode.value) {
+    htmlElement.classList.add('dark')
+    localStorage.setItem('theme', 'dark')
+  } else {
+    htmlElement.classList.remove('dark')
+    localStorage.setItem('theme', 'light')
+  }
+}
 </script>
 
 <style scoped>
@@ -193,7 +266,7 @@ defineEmits<{
     padding: 6px 8px;
     min-width: 50px;
   }
-  
+
   .link-title {
     @apply text-xs;
   }
