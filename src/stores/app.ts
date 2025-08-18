@@ -350,6 +350,10 @@ export const useAppStore = defineStore('app', () => {
   // Ações de navegação e modal
   const setActiveTab = (tab: string) => {
     activeTab.value = tab
+    // Limpar aluno selecionado quando navegar para outras abas
+    if (tab !== 'students' && currentStudent.value) {
+      currentStudent.value = null
+    }
   }
 
   const setCurrentStudent = (student: Student | null) => {

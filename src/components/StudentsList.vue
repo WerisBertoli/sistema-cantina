@@ -1,26 +1,16 @@
 <template>
   <div class="bg-white dark:bg-gray-900">
-    <div class="px-3 pt-3 pb-2 sm:px-4 sm:pt-4 bg-white dark:bg-gray-800">
+    <div class="px-3 pt-3 pb-2 sm:px-4 sm:pt-4 bg-white dark:bg-gray-900">
       <h2 class="modern-title text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-blue-600 dark:text-blue-400 text-center">
-        <span class="flex items-center justify-center space-x-2">
-          <svg class="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-           </svg>
-          <span>Lista de Alunos</span>
-        </span>
+        Lista de Alunos
       </h2>
       
       <div class="mb-4 sm:mb-6 flex justify-center">
         <div class="relative w-full max-w-md">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-          </div>
           <input
             v-model="searchTerm"
             type="text"
-            class="modern-search-input w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-3 text-sm sm:text-base"
+            class="modern-search-input w-full px-4 py-2 sm:py-3 text-sm sm:text-base"
             placeholder="Buscar aluno..."
           />
         </div>
@@ -31,36 +21,59 @@
       <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300">Nenhum aluno encontrado</p>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <!-- Layout para Mobile (Cards) -->
+    <div class="block sm:hidden px-3 space-y-4">
+      <div 
+        v-for="(student, index) in filteredStudents" 
+        :key="student.id"
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-5 cursor-pointer transition-all duration-200 hover:shadow-xl hover:scale-[1.02]"
+        @click="selectStudent(student)"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex-1 min-w-0">
+            <div class="mb-2">
+              <h3 class="font-semibold text-lg text-gray-900 dark:text-white truncate">{{ student.name }}</h3>
+            </div>
+            <p v-if="student.parentName" class="text-base text-gray-600 dark:text-gray-300 truncate">{{ student.parentName }}</p>
+          </div>
+          
+          <div class="flex flex-col items-end space-y-3 flex-shrink-0">
+            <div class="flex items-center space-x-2">
+              <div :class="[
+                'w-4 h-4 rounded-full flex-shrink-0',
+                student.balance >= 15 ? 'bg-green-400' : student.balance >= 12 ? 'bg-yellow-400' : 'bg-red-400'
+              ]"></div>
+              <span :class="getBalanceClass(student.balance)" class="font-bold text-lg">
+                {{ store.formatCurrency(student.balance) }}
+              </span>
+            </div>
+            
+            <button 
+              @click.stop="store.openModal('consumption', student)"
+              class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0 min-w-[80px]"
+            >
+              Consumo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layout para Desktop (Tabela) -->
+    <div class="hidden sm:block bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full divide-y divide-gray-200 dark:divide-gray-600">
         <thead>
           <tr class="bg-blue-600 dark:bg-blue-700">
-            <th class="px-2 py-3 text-left text-xs font-semibold text-white sm:px-4 sm:text-sm tracking-wide w-1/2">
-              <div class="flex items-center space-x-1 sm:space-x-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                </svg>
-                <span>Nome</span>
-              </div>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white tracking-wide">
+              Nome
             </th>
-            <th class="px-2 py-3 text-left text-xs font-semibold text-white sm:px-4 sm:text-sm tracking-wide w-1/4">
-              <div class="flex items-center space-x-1 sm:space-x-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                 </svg>
-                <span class="hidden sm:inline">Saldo</span>
-              </div>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white tracking-wide">
+              Saldo
             </th>
-            <th class="px-2 py-3 text-right text-xs font-semibold text-white sm:px-4 sm:text-sm tracking-wide w-1/4">
-               <div class="flex items-center justify-end space-x-1 sm:space-x-2">
-                 <svg class="w-4 h-4 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
-                 </svg>
-                 <span class="hidden sm:inline">Ações</span>
-                 <span class="sm:hidden">•••</span>
-               </div>
-             </th>
+            <th class="px-4 py-3 text-right text-sm font-semibold text-white tracking-wide">
+              Ações
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -75,42 +88,37 @@
              ]"
             @click="selectStudent(student)"
           >
-            <td class="px-2 py-3 sm:px-4 sm:py-4 whitespace-nowrap">
+            <td class="px-4 py-4 whitespace-nowrap">
               <div class="flex items-center">
-
                 <div class="flex-1 min-w-0">
-                  <div class="font-semibold text-xs sm:text-sm text-gray-900 dark:text-white truncate flex items-center">
-                    <svg class="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
+                  <div class="font-semibold text-sm text-gray-900 dark:text-white truncate">
                     {{ student.name }}
                   </div>
-                  <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate mt-1 hidden sm:block" v-if="student.parentName">
+                  <div class="text-sm text-gray-500 dark:text-gray-400 truncate mt-1" v-if="student.parentName">
                     {{ student.parentName }}
                   </div>
                 </div>
               </div>
             </td>
-            <td class="px-2 py-3 sm:px-4 sm:py-4 whitespace-nowrap">
-              <div class="flex items-center space-x-1 sm:space-x-2">
+            <td class="px-4 py-4 whitespace-nowrap">
+              <div class="flex items-center space-x-2">
                 <div class="flex-shrink-0">
                   <div :class="[
-                    'w-2 h-2 sm:w-3 sm:h-3 rounded-full',
+                    'w-3 h-3 rounded-full',
                     student.balance >= 15 ? 'bg-green-400' : student.balance >= 12 ? 'bg-yellow-400' : 'bg-red-400'
                   ]"></div>
                 </div>
-                <span :class="getBalanceClass(student.balance)" class="font-semibold text-xs sm:text-sm">
+                <span :class="getBalanceClass(student.balance)" class="font-semibold text-sm">
                   {{ store.formatCurrency(student.balance) }}
                 </span>
               </div>
             </td>
-            <td class="px-2 py-3 sm:px-4 sm:py-4 whitespace-nowrap text-right text-xs sm:text-sm font-medium">
+            <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
               <button 
                 @click.stop="store.openModal('consumption', student)"
                 class="compact-action-button"
               >
-                <span class="hidden sm:inline">Consumo</span>
-                <span class="sm:hidden">Ver</span>
+                Consumo
               </button>
             </td>
           </tr>

@@ -7,23 +7,8 @@
       :class="{ active: activeTab === 'students' }"
     >
       <span class="link-icon">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          class="sm:w-6 sm:h-6"
-          fill="currentColor"
-          viewBox="0 0 256 256"
-        >
-          <rect width="256" height="256" fill="none"></rect>
-          <path
-            d="M213.3815,109.61945,133.376,36.88436a8,8,0,0,0-10.76339.00036l-79.9945,72.73477A8,8,0,0,0,40,115.53855V208a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V115.53887A8,8,0,0,0,213.3815,109.61945Z"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          ></path>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
         </svg>
       </span>
       <span class="link-title">Home</span>
@@ -36,48 +21,8 @@
       :class="{ active: activeTab === 'earnings' }"
     >
       <span class="link-icon">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          class="sm:w-6 sm:h-6"
-          fill="currentColor"
-          viewBox="0 0 256 256"
-        >
-          <rect width="256" height="256" fill="none"></rect>
-          <rect
-            x="48"
-            y="144"
-            width="32"
-            height="64"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          ></rect>
-          <rect
-            x="112"
-            y="112"
-            width="32"
-            height="96"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          ></rect>
-          <rect
-            x="176"
-            y="80"
-            width="32"
-            height="128"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          ></rect>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>
       </span>
       <span class="link-title">Ganhos</span>
@@ -90,35 +35,8 @@
       :class="{ active: activeTab === 'tarefas' }"
     >
       <span class="link-icon">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          class="sm:w-6 sm:h-6"
-          fill="currentColor"
-          viewBox="0 0 256 256"
-        >
-          <rect width="256" height="256" fill="none"></rect>
-          <rect
-            x="40"
-            y="40"
-            width="176"
-            height="176"
-            rx="8"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          ></rect>
-          <polyline
-            points="88 128 112 152 168 96"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="16"
-          ></polyline>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3-6h.008v.008H15.75V12Zm0 3h.008v.008H15.75V15Zm0 3h.008v.008H15.75V18ZM6.75 6h10.5a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 17.25v-9A2.25 2.25 0 0 1 6.75 6Z" />
         </svg>
       </span>
       <span class="link-title">Tarefas</span>
@@ -143,7 +61,7 @@ const isDarkMode = ref(false)
 const toggleDarkMode = () => {
   isDarkMode.value = !isDarkMode.value
   const htmlElement = document.documentElement
-
+  
   if (isDarkMode.value) {
     htmlElement.classList.add('dark')
     localStorage.setItem('theme', 'dark')

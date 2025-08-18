@@ -114,34 +114,9 @@
               : 'bg-gradient-to-r from-gray-50 to-green-50 dark:from-gray-700 dark:to-gray-600 border-gray-200 dark:border-gray-600',
           ]"
         >
-          <div class="flex items-center space-x-4">
-            <div
-              :class="[
-                'w-10 h-10 text-white rounded-full flex items-center justify-center shadow-lg',
-                transaction.type === 'credit'
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600'
-                  : 'bg-gradient-to-r from-green-500 to-green-600',
-              ]"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  v-if="transaction.type === 'credit'"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                ></path>
-                <path
-                  v-else
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                ></path>
-              </svg>
-            </div>
-            <div>
-              <p class="font-semibold text-gray-800 dark:text-white text-lg">
+          <div class="flex items-center flex-1 min-w-0">
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-gray-800 dark:text-white text-lg truncate">
                 {{ getStudentName(transaction.studentId) }}
               </p>
               <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -151,31 +126,33 @@
                 v-if="transaction.items && transaction.items.length > 0"
                 class="text-xs text-gray-500 dark:text-gray-400 mt-1"
               >
-                {{
-                  transaction.items
-                    .map((item: TransactionItem) => `${item.quantity}x ${item.productName}`)
-                    .join(', ')
-                }}
+                <div
+                  v-for="item in transaction.items"
+                  :key="item.productName"
+                  class="leading-tight"
+                >
+                  {{ item.quantity }}x {{ item.productName }}
+                </div>
               </div>
               <div
                 v-if="transaction.type === 'credit'"
                 class="text-xs text-blue-600 dark:text-blue-400 mt-1 font-medium"
               >
-                ✅ Recarga de crédito
+                Recarga de crédito
               </div>
             </div>
           </div>
-          <div class="text-right">
+          <div class="text-right flex-shrink-0 ml-4">
             <p
               :class="[
-                'font-bold text-lg',
+                'font-bold text-lg whitespace-nowrap',
                 transaction.type === 'credit' ? 'text-blue-600' : 'text-green-600',
               ]"
             >
               {{ transaction.type === 'credit' ? '+' : '' }}{{ formatCurrency(transaction.value) }}
             </p>
-            <p class="text-xs text-gray-500 dark:text-gray-400">
-              {{ transaction.type === 'credit' ? '💳 Recarga' : '🛒 Consumo' }}
+            <p class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+              {{ transaction.type === 'credit' ? 'Recarga' : 'Consumo' }}
             </p>
           </div>
         </div>

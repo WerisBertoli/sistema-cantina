@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900 p-4">
-    <div class="max-w-md mx-auto">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
+    <div class="max-w-lg mx-auto">
       <!-- Order Buttons -->
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">📞 Fazer Pedidos</h2>
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">Fazer Pedidos</h2>
 
         <div class="grid grid-cols-2 gap-3">
           <!-- Salgados Button -->
@@ -47,9 +47,9 @@
       </div>
 
       <!-- Header -->
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6">
         <div class="flex items-center justify-between mb-4">
-          <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">📝 Lista de Compras</h1>
+          <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Lista de Compras</h1>
           <div class="bg-blue-100 dark:bg-blue-900 px-3 py-1 rounded-full">
             <span class="text-blue-800 dark:text-blue-200 text-sm font-medium"
               >{{ pendingItems.length }} pendentes</span
@@ -69,17 +69,19 @@
           <button
             @click="addItem"
             :disabled="!newItem.trim()"
-            class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
           >
-            ➕
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
           </button>
         </div>
       </div>
 
       <!-- Pending Items -->
-      <div v-if="pendingItems.length > 0" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
+      <div v-if="pendingItems.length > 0" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6">
         <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-          🛒 Preciso Comprar
+          Preciso Comprar
           <span class="ml-2 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs px-2 py-1 rounded-full">{{
             pendingItems.length
           }}</span>
@@ -101,18 +103,20 @@
             <span class="text-xs text-gray-500 dark:text-gray-400">{{ formatDate(item.createdAt) }}</span>
             <button
               @click="deleteItem(item.id)"
-              class="text-red-500 hover:text-red-700 transition-colors"
+              class="text-red-500 hover:text-red-700 transition-colors p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
             >
-              🗑️
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
             </button>
           </div>
         </div>
       </div>
 
       <!-- Completed Items -->
-      <div v-if="completedItems.length > 0" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div v-if="completedItems.length > 0" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
         <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-          ✅ Já Comprei
+          Já Comprei
           <span class="ml-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded-full">{{
             completedItems.length
           }}</span>
@@ -136,9 +140,11 @@
             }}</span>
             <button
               @click="deleteItem(item.id)"
-              class="text-red-500 hover:text-red-700 transition-colors"
+              class="text-red-500 hover:text-red-700 transition-colors p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
             >
-              🗑️
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
             </button>
           </div>
         </div>
@@ -146,15 +152,23 @@
         <!-- Clear completed button -->
         <button
           @click="clearCompleted"
-          class="mt-4 w-full py-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors"
+          class="mt-4 w-full py-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm transition-colors flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
         >
-          🧹 Limpar itens concluídos
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          Limpar itens concluídos
         </button>
       </div>
 
       <!-- Empty state -->
-      <div v-if="items.length === 0" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
-        <div class="text-6xl mb-4">🛒</div>
+      <div v-if="items.length === 0" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center">
+        <div class="flex justify-center mb-4">
+          <svg class="w-16 h-16 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6M9 16h6"/>
+           </svg>
+        </div>
         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Lista vazia</h3>
         <p class="text-gray-600 dark:text-gray-400">Adicione itens que você precisa comprar!</p>
       </div>

@@ -1,94 +1,50 @@
 <template>
   <div class="flex flex-col h-screen">
     <!-- Header -->
-    <header class="modern-header relative px-3 sm:px-4 py-4 sm:py-5">
+    <header class="modern-header relative px-3 sm:px-4 py-6 sm:py-8">
       <div class="flex items-center justify-between relative z-10">
-        <!-- Botão Voltar -->
+        <!-- Logo da Escola -->
+        <div class="flex items-center">
+          <img 
+            src="/logo-erlach.png" 
+            alt="Logo Centro Educacional Erlach" 
+            class="h-8 w-8 sm:h-10 sm:w-10 object-contain"
+            style="background: transparent; mix-blend-mode: multiply;"
+          />
+        </div>
+
+        <!-- Botão Voltar (quando há estudante selecionado) -->
         <button
           v-if="store.currentStudent"
           @click="store.setCurrentStudent(null)"
           class="modern-back-button flex items-center px-3 py-2 rounded-lg transition-all duration-300"
         >
-          <svg
-            class="mr-1 sm:mr-2 sm:h-4 sm:w-4"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="m15 18-6-6 6-6" />
-          </svg>
+          <!-- SVG removido -->
           <span class="text-sm sm:text-base">Voltar</span>
         </button>
 
-        <!-- Espaço vazio quando não há botão voltar -->
-        <div v-else class="w-16"></div>
-
-        <!-- Nome da Escola -->
-        <div class="flex flex-col items-center flex-1 school-name-container">
-          <div class="flex items-center space-x-2 mb-1">
-            <svg
-              class="w-4 h-4 sm:w-5 sm:h-5 text-white/80"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-              ></path>
-            </svg>
-            <div class="text-xs sm:text-sm text-white font-medium leading-tight tracking-wide">
-              CENTRO EDUCACIONAL
-            </div>
-          </div>
-          <div
-            class="text-lg sm:text-2xl font-bold text-white leading-tight tracking-wider school-title"
-          >
-            ERLACH
-          </div>
-          <div class="text-xs sm:text-sm text-white/80 leading-tight font-medium">
-            Cantina Digital
-          </div>
-        </div>
-
-        <!-- Botão de Toggle Dark/Light Mode -->
+        <!-- Toggle Dark Mode -->
         <button
           @click="toggleDarkMode"
-          class="modern-toggle-button p-2 sm:p-3 rounded-xl transition-all duration-300"
-          :title="isDarkMode ? 'Modo Claro' : 'Modo Escuro'"
+          class="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
         >
           <!-- Ícone Sol (Modo Claro) -->
-          <svg
-            v-if="isDarkMode"
-            class="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-            ></path>
+          <svg v-if="isDarkMode" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-white">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
           </svg>
+          
           <!-- Ícone Lua (Modo Escuro) -->
-          <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-            ></path>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-white">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
           </svg>
         </button>
+      </div>
+      
+      <!-- Cantina Digital - Centralizado -->
+      <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+        <h1 class="text-lg sm:text-xl font-bold tracking-wider text-white">
+          Cantina Digital
+        </h1>
       </div>
     </header>
 
@@ -116,14 +72,7 @@
       @click="store.openModal('addStudent')"
       class="fab"
     >
-      <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-        ></path>
-      </svg>
+      <!-- SVG removido -->
     </button>
   </div>
 </template>

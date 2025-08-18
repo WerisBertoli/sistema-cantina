@@ -47,7 +47,11 @@
           </div>
 
           <div class="space-y-3">
-            <div v-for="(product, index) in products" :key="index" class="p-3 border rounded-lg">
+            <div
+              v-for="(product, index) in products"
+              :key="index"
+              class="p-3 border rounded-lg"
+            >
               <div class="flex items-center gap-3 mb-2">
                 <div class="flex-1">
                   <input
@@ -57,7 +61,7 @@
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
-
+                
                 <button
                   @click="removeProduct(index)"
                   class="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
@@ -73,7 +77,7 @@
                   </svg>
                 </button>
               </div>
-
+              
               <div class="flex items-center gap-3">
                 <div class="flex-1">
                   <label class="block text-xs text-gray-600 mb-1">Sabor:</label>
@@ -84,7 +88,7 @@
                     class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
-
+                
                 <div class="flex items-center gap-2">
                   <label class="text-sm text-gray-600">Qtd:</label>
                   <input
@@ -216,7 +220,7 @@ const products = ref<Product[]>([
 const showAddProduct = ref(false)
 const newProduct = ref({
   name: '',
-  description: '',
+  description: ''
 })
 
 const addNewProduct = () => {
@@ -224,9 +228,9 @@ const addNewProduct = () => {
     products.value.push({
       name: newProduct.value.name.trim(),
       description: newProduct.value.description.trim(),
-      quantity: 0,
+      quantity: 0
     })
-
+    
     // Reset form
     newProduct.value = { name: '', description: '' }
     showAddProduct.value = false
@@ -269,11 +273,11 @@ const closeModal = () => {
   products.value.forEach((product) => {
     product.quantity = 0
   })
-
+  
   // Reset add product form
   showAddProduct.value = false
   newProduct.value = { name: '', description: '' }
-
+  
   emit('close')
 }
 
@@ -298,7 +302,7 @@ const generateWhatsAppMessage = () => {
   const encodedMessage = encodeURIComponent(message)
   const phoneNumber = whatsappNumber.value.replace(/\D/g, '') // Remove non-digits
   const whatsappUrl = `https://wa.me/55${phoneNumber}?text=${encodedMessage}`
-
+  
   window.open(whatsappUrl, '_blank')
 
   closeModal()

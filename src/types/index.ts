@@ -52,7 +52,7 @@ export interface Earnings {
 export enum BalanceStatus {
   NORMAL = 'normal',
   LOW = 'low',
-  CRITICAL = 'critical',
+  CRITICAL = 'critical'
 }
 
 // Interface para navegação
@@ -65,14 +65,6 @@ export interface NavigationTab {
 // Interface para modal
 export interface ModalState {
   isOpen: boolean
-  type:
-    | 'addStudent'
-    | 'addCredit'
-    | 'consumption'
-    | 'quickConsumption'
-    | 'message'
-    | 'weeklyHistory'
-    | 'editStudent'
-    | null
+  type: 'addStudent' | 'addCredit' | 'consumption' | 'quickConsumption' | 'message' | 'weeklyHistory' | 'editStudent' | null
   data?: Student | TransactionItem[] | { student: Student } | { type: string } | any
 }
