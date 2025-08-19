@@ -13,8 +13,8 @@ import WeeklyHistoryModal from './components/modals/WeeklyHistoryModal.vue'
 
 const store = useAppStore()
 
-onMounted(() => {
-  store.initializeApp()
+onMounted(async () => {
+  await store.initializeApp()
 })
 </script>
 

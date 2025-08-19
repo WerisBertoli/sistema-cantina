@@ -46,7 +46,7 @@
         </div>
       </div>
 
-      <!-- Grid de Produtos -->
+      <!-- Grid de Produtos por Categoria -->
       <div class="mb-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
@@ -54,81 +54,262 @@
           </h3>
         </div>
 
-        <div class="product-grid">
-          <div v-for="product in store.products" :key="product.id" class="product-card">
-            <div class="product-image">
-              <img
-                v-if="product.imageUrl"
-                :src="product.imageUrl"
-                :alt="product.name"
-                class="product-image-real"
-                @error="
-                  (e) => {
-                    console.log('Erro ao carregar imagem:', product.name, product.imageUrl)
-                    const target = e.target as HTMLImageElement
-                    if (target) {
-                      target.style.display = 'none'
-                      const sibling = target.nextElementSibling as HTMLElement
-                      if (sibling) sibling.style.display = 'flex'
+        <!-- Lanches -->
+        <div v-if="productsByCategory.lanche.length > 0" class="mb-6">
+          <div class="flex items-center mb-3">
+            <div class="w-4 h-4 bg-orange-500 rounded-full mr-2"></div>
+            <h4 class="text-md font-medium text-gray-700 dark:text-gray-300">
+              Lanches ({{ productsByCategory.lanche.length }})
+            </h4>
+          </div>
+          <div class="product-grid">
+            <div v-for="product in productsByCategory.lanche" :key="product.id" class="product-card border-l-4 border-orange-500">
+              <div class="product-image">
+                <img
+                  v-if="product.imageUrl"
+                  :src="product.imageUrl"
+                  :alt="product.name"
+                  class="product-image-real"
+                  @error="
+                    (e) => {
+                      console.log('Erro ao carregar imagem:', product.name, product.imageUrl)
+                      const target = e.target as HTMLImageElement
+                      if (target) {
+                        target.style.display = 'none'
+                        const sibling = target.nextElementSibling as HTMLElement
+                        if (sibling) sibling.style.display = 'flex'
+                      }
                     }
-                  }
-                "
-                @load="
-                  console.log('✅ Imagem carregada com sucesso:', product.name, product.imageUrl)
-                "
-              />
-              <div
-                class="image-placeholder"
-                :style="{ display: product.imageUrl ? 'none' : 'flex' }"
-              >
-                <svg
-                  class="w-8 h-8 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                  "
+                  @load="
+                    console.log('✅ Imagem carregada com sucesso:', product.name, product.imageUrl)
+                  "
+                />
+                <div
+                  class="image-placeholder"
+                  :style="{ display: product.imageUrl ? 'none' : 'flex' }"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  ></path>
-                </svg>
+                  <svg
+                    class="w-8 h-8 text-orange-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"
+                    ></path>
+                  </svg>
+                </div>
+
+                <!-- Quantidade no carrinho -->
+                <div v-if="getCartQuantity(product) > 0" class="quantity-badge bg-orange-500">
+                  {{ getCartQuantity(product) }}
+                </div>
               </div>
 
-              <!-- Quantidade no carrinho -->
-              <div v-if="getCartQuantity(product) > 0" class="quantity-badge">
-                {{ getCartQuantity(product) }}
+              <div class="product-info">
+                <h4 class="product-name">{{ product.name }}</h4>
+                <p class="product-price">{{ store.formatCurrency(product.price) }}</p>
               </div>
-            </div>
 
-            <div class="product-info">
-              <h4 class="product-name">{{ product.name }}</h4>
-              <p class="product-price">{{ store.formatCurrency(product.price) }}</p>
-            </div>
+              <div class="product-actions">
+                <button
+                  @click="removeFromCart(product)"
+                  :disabled="getCartQuantity(product) === 0"
+                  class="button-3d remove-btn"
+                  :class="{ disabled: getCartQuantity(product) === 0 }"
+                >
+                  <div class="button-top">
+                    <span class="material-icons">−</span>
+                  </div>
+                </button>
 
-            <div class="product-actions">
-              <button
-                @click="removeFromCart(product)"
-                :disabled="getCartQuantity(product) === 0"
-                class="button-3d remove-btn"
-                :class="{ disabled: getCartQuantity(product) === 0 }"
-              >
-                <div class="button-top">
-                  <span class="material-icons">−</span>
-                </div>
-              </button>
+                <span class="quantity-display">{{ getCartQuantity(product) }}</span>
 
-              <span class="quantity-display">{{ getCartQuantity(product) }}</span>
-
-              <button @click="addToCart(product)" class="button-3d add-btn">
-                <div class="button-top">
-                  <span class="material-icons">+</span>
-                </div>
-              </button>
+                <button @click="addToCart(product)" class="button-3d add-btn">
+                  <div class="button-top">
+                    <span class="material-icons">+</span>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Bebidas -->
+        <div v-if="productsByCategory.bebida.length > 0" class="mb-6">
+          <div class="flex items-center mb-3">
+            <div class="w-4 h-4 bg-blue-500 rounded-full mr-2"></div>
+            <h4 class="text-md font-medium text-gray-700 dark:text-gray-300">
+              Bebidas ({{ productsByCategory.bebida.length }})
+            </h4>
+          </div>
+          <div class="product-grid">
+            <div v-for="product in productsByCategory.bebida" :key="product.id" class="product-card border-l-4 border-blue-500">
+              <div class="product-image">
+                <img
+                  v-if="product.imageUrl"
+                  :src="product.imageUrl"
+                  :alt="product.name"
+                  class="product-image-real"
+                  @error="
+                    (e) => {
+                      console.log('Erro ao carregar imagem:', product.name, product.imageUrl)
+                      const target = e.target as HTMLImageElement
+                      if (target) {
+                        target.style.display = 'none'
+                        const sibling = target.nextElementSibling as HTMLElement
+                        if (sibling) sibling.style.display = 'flex'
+                      }
+                    }
+                  "
+                  @load="
+                    console.log('✅ Imagem carregada com sucesso:', product.name, product.imageUrl)
+                  "
+                />
+                <div
+                  class="image-placeholder"
+                  :style="{ display: product.imageUrl ? 'none' : 'flex' }"
+                >
+                  <svg
+                    class="w-8 h-8 text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    ></path>
+                  </svg>
+                </div>
+
+                <!-- Quantidade no carrinho -->
+                <div v-if="getCartQuantity(product) > 0" class="quantity-badge bg-blue-500">
+                  {{ getCartQuantity(product) }}
+                </div>
+              </div>
+
+              <div class="product-info">
+                <h4 class="product-name">{{ product.name }}</h4>
+                <p class="product-price">{{ store.formatCurrency(product.price) }}</p>
+              </div>
+
+              <div class="product-actions">
+                <button
+                  @click="removeFromCart(product)"
+                  :disabled="getCartQuantity(product) === 0"
+                  class="button-3d remove-btn"
+                  :class="{ disabled: getCartQuantity(product) === 0 }"
+                >
+                  <div class="button-top">
+                    <span class="material-icons">−</span>
+                  </div>
+                </button>
+
+                <span class="quantity-display">{{ getCartQuantity(product) }}</span>
+
+                <button @click="addToCart(product)" class="button-3d add-btn">
+                  <div class="button-top">
+                    <span class="material-icons">+</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Doces -->
+        <div v-if="productsByCategory.doce.length > 0" class="mb-6">
+          <div class="flex items-center mb-3">
+            <div class="w-4 h-4 bg-pink-500 rounded-full mr-2"></div>
+            <h4 class="text-md font-medium text-gray-700 dark:text-gray-300">
+              Doces ({{ productsByCategory.doce.length }})
+            </h4>
+          </div>
+          <div class="product-grid">
+            <div v-for="product in productsByCategory.doce" :key="product.id" class="product-card border-l-4 border-pink-500">
+              <div class="product-image">
+                <img
+                  v-if="product.imageUrl"
+                  :src="product.imageUrl"
+                  :alt="product.name"
+                  class="product-image-real"
+                  @error="
+                    (e) => {
+                      console.log('Erro ao carregar imagem:', product.name, product.imageUrl)
+                      const target = e.target as HTMLImageElement
+                      if (target) {
+                        target.style.display = 'none'
+                        const sibling = target.nextElementSibling as HTMLElement
+                        if (sibling) sibling.style.display = 'flex'
+                      }
+                    }
+                  "
+                  @load="
+                    console.log('✅ Imagem carregada com sucesso:', product.name, product.imageUrl)
+                  "
+                />
+                <div
+                  class="image-placeholder"
+                  :style="{ display: product.imageUrl ? 'none' : 'flex' }"
+                >
+                  <svg
+                    class="w-8 h-8 text-pink-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    ></path>
+                  </svg>
+                </div>
+
+                <!-- Quantidade no carrinho -->
+                <div v-if="getCartQuantity(product) > 0" class="quantity-badge bg-pink-500">
+                  {{ getCartQuantity(product) }}
+                </div>
+              </div>
+
+              <div class="product-info">
+                <h4 class="product-name">{{ product.name }}</h4>
+                <p class="product-price">{{ store.formatCurrency(product.price) }}</p>
+              </div>
+
+              <div class="product-actions">
+                <button
+                  @click="removeFromCart(product)"
+                  :disabled="getCartQuantity(product) === 0"
+                  class="button-3d remove-btn"
+                  :class="{ disabled: getCartQuantity(product) === 0 }"
+                >
+                  <div class="button-top">
+                    <span class="material-icons">−</span>
+                  </div>
+                </button>
+
+                <span class="quantity-display">{{ getCartQuantity(product) }}</span>
+
+                <button @click="addToCart(product)" class="button-3d add-btn">
+                  <div class="button-top">
+                    <span class="material-icons">+</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
       </div>
 
       <!-- Resumo do Carrinho -->
@@ -218,6 +399,24 @@ const getBalanceClass = (balance: number) => {
 //     'bg-red-100 text-red-800': status === BalanceStatus.CRITICAL
 //   }
 // }
+
+const productsByCategory = computed(() => {
+  const categories = {
+    bebida: [] as Product[],
+    lanche: [] as Product[],
+    doce: [] as Product[]
+  }
+  
+  store.products.forEach(product => {
+    if (product.category && categories[product.category]) {
+      categories[product.category].push(product)
+    } else {
+      categories.doce.push(product)
+    }
+  })
+  
+  return categories
+})
 
 const getCartQuantity = (product: Product) => {
   const item = store.cart.find((item) => item.product.id === product.id)

@@ -11,10 +11,12 @@ export interface Student {
 
 // Interface para Produto
 export interface Product {
-  id?: string
+  id: string
   name: string
   price: number
   imageUrl?: string
+  category?: 'bebida' | 'lanche' | 'doce'
+  active?: boolean
 }
 
 // Interface para item de transação
@@ -61,6 +63,9 @@ export interface NavigationTab {
   label: string
   icon: string
 }
+
+// Tipo para abas de navegação
+export type NavigationTabType = 'students' | 'earnings' | 'products' | 'todo'
 
 // Interface para modal
 export interface ModalState {

@@ -83,17 +83,10 @@ export const useAppStore = defineStore('app', () => {
       isLoading.value = true
       console.log('🔄 Iniciando aplicação...')
 
-      // Tentar autenticação anônima, mas continuar mesmo se falhar
-      try {
-        console.log('🔄 Tentando login anônimo...')
-        await signInAnonymous()
-        console.log('✅ Login anônimo realizado com sucesso')
-        isAuthenticated.value = true
-      } catch (authError: unknown) {
-        console.warn('⚠️ Falha na autenticação anônima:', authError)
-        console.warn('⚠️ Continuando sem autenticação para teste...')
-        isAuthenticated.value = false
-      }
+      // Autenticação anônima
+      await signInAnonymous()
+      console.log('🔄 Inicializando aplicação...')
+      isAuthenticated.value = true
 
       console.log('🔄 Carregando dados...')
       await loadData()
@@ -130,11 +123,48 @@ export const useAppStore = defineStore('app', () => {
     onSnapshot(productsQuery, async (snapshot) => {
       products.value = snapshot.docs.map((doc) => {
         const data = doc.data()
+        const productName = (data.nome || data.name || '').toLowerCase()
+        
+        // Usar categoria do Firebase se disponível, senão determinar baseada no nome
+        let category: 'bebida' | 'lanche' | 'doce' = data.category || 'doce'
+        
+        // Se não há categoria no Firebase, determinar baseada no nome do produto
+        if (!data.category) {
+          // Lanches específicos
+          if (productName.includes('cachorro quente') || 
+              productName.includes('pipoca doce') || 
+              productName.includes('biscoito teens chips yokitos') || 
+              productName.includes('misto') || 
+              productName.includes('passatempo') ||
+              productName.includes('sanduíche') || productName.includes('hambúrguer') ||
+              productName.includes('pizza') || productName.includes('pastel') ||
+              productName.includes('coxinha') || productName.includes('pão') ||
+              productName.includes('lanche') || productName.includes('salgado') ||
+              productName.includes('empada') || productName.includes('esfirra')) {
+            category = 'lanche'
+          }
+          // Bebidas específicas
+          else if (productName.includes('toddynho') || 
+                   productName.includes('refrigerante lata') || 
+                   productName.includes('guaravita') ||
+                   productName.includes('suco') || productName.includes('água') || 
+                   productName.includes('refrigerante') || productName.includes('coca') ||
+                   productName.includes('pepsi') || productName.includes('guaraná') ||
+                   productName.includes('fanta') || productName.includes('sprite') ||
+                   productName.includes('bebida') || productName.includes('café') ||
+                   productName.includes('chá') || productName.includes('leite')) {
+            category = 'bebida'
+          }
+          // Todos os outros produtos (incluindo doces, chocolates, balas, etc.) ficam como 'doce'
+        }
+        
         const product = {
           id: doc.id,
           name: data.nome || data.name,
           price: data.preco || data.price || 0,
           imageUrl: data.imagem,
+          category: category,
+          active: data.active !== false // Default to true if not specified
         } as Product
         console.log('Produto carregado:', product)
         return product
@@ -210,6 +240,43 @@ export const useAppStore = defineStore('app', () => {
       closeModal()
     } catch (error) {
       console.error('Erro ao atualizar aluno:', error)
+      throw error
+    }
+  }
+
+  const addProduct = async (product: Omit<Product, 'id'>) => {
+    try {
+      // Converter para os nomes de campos do Firebase
+      const firebaseData = {
+        nome: product.name,
+        preco: product.price,
+        imagem: product.imageUrl,
+        category: product.category,
+        active: product.active !== false,
+        dataCriacao: Timestamp.now(),
+      }
+      await addDoc(collection(db, 'produtos'), firebaseData)
+      closeModal()
+    } catch (error) {
+      console.error('Erro ao adicionar produto:', error)
+      throw error
+    }
+  }
+
+  const updateProduct = async (productId: string, updates: Partial<Product>) => {
+    try {
+      // Converter para os nomes de campos do Firebase
+      const firebaseData: Record<string, any> = {}
+      if (updates.name !== undefined) firebaseData.nome = updates.name
+      if (updates.price !== undefined) firebaseData.preco = updates.price
+      if (updates.imageUrl !== undefined) firebaseData.imagem = updates.imageUrl
+      if (updates.category !== undefined) firebaseData.category = updates.category
+      if (updates.active !== undefined) firebaseData.active = updates.active
+
+      await updateDoc(doc(db, 'produtos', productId), firebaseData)
+      closeModal()
+    } catch (error) {
+      console.error('Erro ao atualizar produto:', error)
       throw error
     }
   }
@@ -444,6 +511,8 @@ export const useAppStore = defineStore('app', () => {
     initializeApp,
     addStudent,
     updateStudent,
+    addProduct,
+    updateProduct,
     addCredit,
     editCreditTransaction,
     processConsumption,

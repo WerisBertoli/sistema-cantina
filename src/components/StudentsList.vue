@@ -6,13 +6,21 @@
       </h2>
       
       <div class="mb-4 sm:mb-6 flex justify-center">
-        <div class="relative w-full max-w-md">
+        <div class="search-container relative w-full max-w-md">
           <input
             v-model="searchTerm"
             type="text"
-            class="modern-search-input w-full px-4 py-2 sm:py-3 text-sm sm:text-base"
+            class="search-input modern-search-input w-full px-4 py-2 sm:py-3 text-sm sm:text-base"
             placeholder="Buscar aluno..."
           />
+          <button
+            @click="store.openModal('addStudent')"
+            class="add-student-button w-12 h-12 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center flex-shrink-0"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -314,6 +322,21 @@ tbody tr:hover {
   100% {
     filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.4));
   }
+}
+
+/* Container de busca com layout flexível */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.search-input {
+  flex: 1;
+}
+
+.add-student-button {
+  z-index: 10;
 }
 
 /* Estilos para o campo de busca moderno */

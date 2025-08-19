@@ -69,6 +69,9 @@
       <!-- Earnings -->
       <EarningsView v-if="!store.currentStudent && store.activeTab === 'earnings'" />
 
+      <!-- Products Management -->
+      <ProductManagement v-if="!store.currentStudent && store.activeTab === 'products'" />
+
       <!-- Todo List -->
       <TodoListView v-if="!store.currentStudent && store.activeTab === 'tarefas'" />
     </main>
@@ -76,14 +79,7 @@
     <!-- Bottom Navigation -->
     <BottomNavigation @navigate="store.setActiveTab" :activeTab="store.activeTab" />
 
-    <!-- FAB (Floating Action Button) -->
-    <button
-      v-if="!store.currentStudent && store.activeTab === 'students'"
-      @click="store.openModal('addStudent')"
-      class="fab"
-    >
-      <!-- SVG removido -->
-    </button>
+
   </div>
 </template>
 
@@ -93,6 +89,7 @@ import { useAppStore } from '@/stores/app'
 import StudentsList from '@/components/StudentsList.vue'
 import StudentDetails from '@/components/StudentDetails.vue'
 import EarningsView from '@/components/EarningsView.vue'
+import ProductManagement from '../components/ProductManagement.vue'
 import TodoListView from '@/components/TodoListView.vue'
 import BottomNavigation from '@/components/BottomNavigation.vue'
 
