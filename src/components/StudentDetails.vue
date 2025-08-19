@@ -274,12 +274,24 @@ const openLowBalanceAlert = () => {
   color: #10b981;
 }
 
+.dark .status-good {
+  color: #34d399;
+}
+
 .status-warning {
   color: #f59e0b;
 }
 
+.dark .status-warning {
+  color: #fbbf24;
+}
+
 .status-danger {
   color: #ef4444;
+}
+
+.dark .status-danger {
+  color: #f87171;
 }
 
 .actions-grid {

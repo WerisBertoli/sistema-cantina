@@ -444,10 +444,11 @@ export const useAppStore = defineStore('app', () => {
   const generateLowBalanceMessage = (student: Student): string => {
     const parentName = student.parentName || 'responsável'
     return (
-      `Olá, ${parentName}! 👋\n\n` +
-      `O saldo da cantina do(a) ${student.name} está baixo.\n\n` +
+      `Prezado(a) ${parentName}, \n\n` +
+      `Informamos que o saldo da cantina de ${student.name} está baixo.\n\n` +
       `💰 Saldo atual: ${formatCurrency(student.balance)}\n\n` +
-      `Para evitar que ${student.name} fique sem lanche, sugerimos uma recarga. 😊\n\n` +
+      `Para garantir que não falte lanche, sugerimos realizar uma recarga.\n\n` +
+      `Atenciosamente,\n` +
       `Cantina Digital 🏫`
     )
   }
