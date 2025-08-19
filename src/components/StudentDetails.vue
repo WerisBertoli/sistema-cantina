@@ -41,7 +41,7 @@
 
       <button
         class="action-card consumption-action"
-        @click="store.openModal('consumption', { student: store.currentStudent })"
+        @click="store.openModal('consumption', store.currentStudent)"
       >
         <div class="action-icon consumption-icon">
           <svg

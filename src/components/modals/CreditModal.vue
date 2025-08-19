@@ -81,7 +81,17 @@ const isSubmitting = ref(false)
 
 // Usar o aluno passado como prop ou fallback para currentStudent
 const currentStudent = computed(() => {
-  return props.student?.student || store.currentStudent
+  // Se props.student existe, pode ser tanto { student: Student } quanto Student diretamente
+  if (props.student) {
+    // Se tem a propriedade student, é o formato { student: Student }
+    if ('student' in props.student) {
+      return props.student.student
+    }
+    // Senão, é Student diretamente
+    return props.student as Student
+  }
+  // Fallback para currentStudent do store
+  return store.currentStudent
 })
 
 const creditValueNumber = computed(() => {
