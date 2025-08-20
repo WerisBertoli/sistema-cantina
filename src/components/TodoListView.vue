@@ -57,6 +57,11 @@
           </div>
         </div>
 
+        <!-- Error message -->
+        <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {{ error }}
+        </div>
+
         <!-- Add new item form -->
         <div class="flex gap-2">
           <input
@@ -65,14 +70,19 @@
             type="text"
             placeholder="Ex: Molho de tomate, Pão, Salsicha..."
             class="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            :disabled="loading"
           />
           <button
             @click="addItem"
-            :disabled="!newItem.trim()"
+            :disabled="loading || !newItem.trim()"
             class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg v-if="!loading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <svg v-else class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
           </button>
         </div>
@@ -181,20 +191,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import SalgadosOrderModal from './modals/SalgadosOrderModal.vue'
 import TropinhoOrderModal from './modals/TropinhoOrderModal.vue'
+import {
+  addShoppingItem,
+  toggleShoppingItem,
+  deleteShoppingItem,
+  clearCompletedItems,
+  subscribeToShoppingList,
+  convertTimestampToDate,
+  type ShoppingListItem
+} from '../services/shoppingList'
 
-interface TodoItem {
-  id: string
-  text: string
-  completed: boolean
-  createdAt: Date
-  completedAt?: Date
-}
-
-const items = ref<TodoItem[]>([])
+const items = ref<ShoppingListItem[]>([])
 const newItem = ref('')
+const loading = ref(false)
+const error = ref('')
 
 // Modal states
 const showSalgadosModal = ref(false)
@@ -204,64 +217,93 @@ const showTropinhoModal = ref(false)
 const pendingItems = computed(() =>
   items.value
     .filter((item) => !item.completed)
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
+    .sort((a, b) => convertTimestampToDate(b.createdAt).getTime() - convertTimestampToDate(a.createdAt).getTime()),
 )
 
 const completedItems = computed(() =>
   items.value
     .filter((item) => item.completed)
-    .sort((a, b) => (b.completedAt?.getTime() || 0) - (a.completedAt?.getTime() || 0)),
+    .sort((a, b) => {
+      const bTime = b.completedAt ? convertTimestampToDate(b.completedAt).getTime() : 0
+      const aTime = a.completedAt ? convertTimestampToDate(a.completedAt).getTime() : 0
+      return bTime - aTime
+    }),
 )
 
 // Functions
-const addItem = () => {
-  if (!newItem.value.trim()) return
+const addItem = async () => {
+  if (!newItem.value.trim() || loading.value) return
 
-  const item: TodoItem = {
-    id: Date.now().toString(),
-    text: newItem.value.trim(),
-    completed: false,
-    createdAt: new Date(),
+  try {
+    loading.value = true
+    error.value = ''
+    await addShoppingItem(newItem.value.trim())
+    newItem.value = ''
+  } catch (err) {
+    error.value = 'Erro ao adicionar item'
+    console.error(err)
+  } finally {
+    loading.value = false
   }
-
-  items.value.push(item)
-  newItem.value = ''
-  saveToLocalStorage()
 }
 
-const toggleItem = (id: string) => {
+const toggleItem = async (id: string) => {
   const item = items.value.find((item) => item.id === id)
-  if (item) {
-    item.completed = !item.completed
-    if (item.completed) {
-      item.completedAt = new Date()
-    } else {
-      delete item.completedAt
-    }
-    saveToLocalStorage()
+  if (!item || loading.value) return
+
+  try {
+    loading.value = true
+    error.value = ''
+    await toggleShoppingItem(id, !item.completed)
+  } catch (err) {
+    error.value = 'Erro ao atualizar item'
+    console.error(err)
+  } finally {
+    loading.value = false
   }
 }
 
-const deleteItem = (id: string) => {
-  items.value = items.value.filter((item) => item.id !== id)
-  saveToLocalStorage()
+const deleteItem = async (id: string) => {
+  if (loading.value) return
+
+  try {
+    loading.value = true
+    error.value = ''
+    await deleteShoppingItem(id)
+  } catch (err) {
+    error.value = 'Erro ao excluir item'
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
 }
 
-const clearCompleted = () => {
-  items.value = items.value.filter((item) => !item.completed)
-  saveToLocalStorage()
+const clearCompleted = async () => {
+  if (loading.value) return
+
+  try {
+    loading.value = true
+    error.value = ''
+    await clearCompletedItems(items.value)
+  } catch (err) {
+    error.value = 'Erro ao limpar itens'
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
 }
 
-const formatDate = (date: Date) => {
+const formatDate = (date: any) => {
+  const convertedDate = convertTimestampToDate(date)
   const now = new Date()
-  const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+  const diffInHours = (now.getTime() - convertedDate.getTime()) / (1000 * 60 * 60)
 
   if (diffInHours < 1) {
     return 'Agora'
   } else if (diffInHours < 24) {
     return `${Math.floor(diffInHours)}h atrás`
   } else {
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+    return convertedDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
   }
 }
 
@@ -282,25 +324,31 @@ const closeTropinhoModal = () => {
   showTropinhoModal.value = false
 }
 
-// Local Storage
-const saveToLocalStorage = () => {
-  localStorage.setItem('todoItems', JSON.stringify(items.value))
-}
-
-const loadFromLocalStorage = () => {
-  const saved = localStorage.getItem('todoItems')
-  if (saved) {
-    const parsed = JSON.parse(saved)
-    items.value = parsed.map((item: any) => ({
-      ...item,
-      createdAt: new Date(item.createdAt),
-      completedAt: item.completedAt ? new Date(item.completedAt) : undefined,
-    }))
-  }
-}
+// Firebase listener
+let unsubscribe: (() => void) | null = null
 
 // Lifecycle
-onMounted(() => {
-  loadFromLocalStorage()
+onMounted(async () => {
+  try {
+    loading.value = true
+    error.value = ''
+    
+    // Set up real-time listener
+    unsubscribe = subscribeToShoppingList((newItems: ShoppingListItem[]) => {
+      items.value = newItems
+      loading.value = false
+    })
+  } catch (err) {
+    error.value = 'Erro ao carregar lista'
+    console.error(err)
+    loading.value = false
+  }
+})
+
+// Cleanup listener on unmount
+onUnmounted(() => {
+  if (unsubscribe) {
+    unsubscribe()
+  }
 })
 </script>
