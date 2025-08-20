@@ -49,11 +49,16 @@
           <div class="space-y-3">
             <div
               v-for="(product, index) in products"
-              :key="product.name"
+              :key="index"
               class="flex items-center gap-3 p-3 border rounded-lg"
             >
               <div class="flex-1">
-                <span class="font-medium text-gray-700">{{ product.name }}</span>
+                <input
+                  v-model="product.name"
+                  type="text"
+                  placeholder="Nome do salgado"
+                  class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-gray-700"
+                />
               </div>
 
               <div class="flex items-center gap-2">

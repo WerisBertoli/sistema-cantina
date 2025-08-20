@@ -23,8 +23,8 @@ onMounted(async () => {
     <!-- Tela de carregamento -->
     <LoadingScreen v-if="store.isLoading" />
 
-    <!-- Layout principal -->
-    <AppLayout v-else />
+    <!-- Router View para navegação entre páginas -->
+    <router-view v-else />
 
     <!-- Modais -->
     <StudentModal

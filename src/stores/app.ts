@@ -12,7 +12,7 @@ import {
   orderBy,
   Timestamp,
 } from 'firebase/firestore'
-import { db, signInAnonymous } from '@/firebase'
+import { db } from '@/firebase'
 
 export const useAppStore = defineStore('app', () => {
   // Estado reativo
@@ -83,8 +83,7 @@ export const useAppStore = defineStore('app', () => {
       isLoading.value = true
       console.log('🔄 Iniciando aplicação...')
 
-      // Autenticação anônima
-      await signInAnonymous()
+      // Verificar se já existe um usuário autenticado
       console.log('🔄 Inicializando aplicação...')
       isAuthenticated.value = true
 

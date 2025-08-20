@@ -203,18 +203,16 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 // WhatsApp number with localStorage persistence
-const whatsappNumber = ref(localStorage.getItem('tropinho-whatsapp') || '')
+const whatsappNumber = ref(localStorage.getItem('whatsappNumber') || '')
 
 // Watch for changes and save to localStorage
 watch(whatsappNumber, (newValue) => {
-  localStorage.setItem('tropinho-whatsapp', newValue)
+  if (newValue.trim()) {
+    localStorage.setItem('whatsappNumber', newValue)
+  }
 })
 
-const products = ref<Product[]>([
-  { name: 'Caixa 60und', description: 'mista', quantity: 0 },
-  { name: 'Caixa 30und', description: 'mista', quantity: 0 },
-  { name: 'Caixa 30und', description: 'framboesa', quantity: 0 },
-])
+const products = ref<Product[]>([])
 
 // Add new product functionality
 const showAddProduct = ref(false)
