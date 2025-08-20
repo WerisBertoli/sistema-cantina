@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useAppStore } from '@/stores/app'
+import { getAuthLoadingState } from '@/router'
 import LoadingScreen from './components/LoadingScreen.vue'
 import AppLayout from './components/AppLayout.vue'
 import StudentModal from './components/modals/StudentModal.vue'
@@ -12,8 +13,21 @@ import MessageModal from './components/modals/MessageModal.vue'
 import WeeklyHistoryModal from './components/modals/WeeklyHistoryModal.vue'
 
 const store = useAppStore()
+const isAuthLoading = ref(true)
+
+// Computed para verificar se ainda está carregando (auth ou app)
+const isLoading = computed(() => store.isLoading || isAuthLoading.value)
+
+// Verificar estado de autenticação periodicamente
+const checkAuthState = () => {
+  isAuthLoading.value = getAuthLoadingState()
+  if (isAuthLoading.value) {
+    setTimeout(checkAuthState, 100) // Verificar a cada 100ms
+  }
+}
 
 onMounted(async () => {
+  checkAuthState() // Iniciar verificação de auth
   await store.initializeApp()
 })
 </script>
@@ -21,7 +35,7 @@ onMounted(async () => {
 <template>
   <div class="app-container">
     <!-- Tela de carregamento -->
-    <LoadingScreen v-if="store.isLoading" />
+    <LoadingScreen v-if="isLoading" />
 
     <!-- Router View para navegação entre páginas -->
     <router-view v-else />

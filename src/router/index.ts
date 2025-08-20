@@ -38,16 +38,54 @@ const router = createRouter({
   ],
 })
 
+// Variável para controlar se a autenticação foi inicializada
+let authInitialized = false
+let currentUser: any = null
+let isAuthLoading = true
+
+// Listener para mudanças no estado de autenticação
+onAuthStateChanged(auth, (user) => {
+  currentUser = user
+  authInitialized = true
+  isAuthLoading = false
+})
+
+// Função para verificar se a autenticação está carregando
+export const getAuthLoadingState = () => isAuthLoading
+
 // Guard de navegação para autenticação
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
   const requiresGuest = to.matched.some(record => record.meta.requiresGuest)
-  const user = auth.currentUser
   
-  if (requiresAuth && !user) {
+  // Se a autenticação ainda não foi inicializada, aguardar
+  if (!authInitialized) {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      currentUser = user
+      authInitialized = true
+      unsubscribe() // Remove o listener após a primeira verificação
+      
+      // Reexecutar a lógica de navegação
+      if (requiresAuth && !currentUser) {
+        next('/login')
+      } else if (requiresGuest && currentUser) {
+        if (to.name === 'login' && from.name === 'forgot-password') {
+          next()
+        } else {
+          next('/home')
+        }
+      } else {
+        next()
+      }
+    })
+    return // Sair da função e aguardar o callback
+  }
+  
+  // Lógica normal de navegação quando a autenticação já foi inicializada
+  if (requiresAuth && !currentUser) {
     // Rota protegida e usuário não autenticado
     next('/login')
-  } else if (requiresGuest && user) {
+  } else if (requiresGuest && currentUser) {
     // Permitir acesso ao login se vier da página de esqueci a senha
     if (to.name === 'login' && from.name === 'forgot-password') {
       next()
