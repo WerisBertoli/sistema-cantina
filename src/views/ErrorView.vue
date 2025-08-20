@@ -16,6 +16,17 @@
         <pre>{{ errorDetails }}</pre>
       </div>
       
+      <div class="debug-info" v-if="showDetails">
+        <h3>Informações de Debug:</h3>
+        <p><strong>User Agent:</strong> {{ userAgent }}</p>
+        <p><strong>URL Atual:</strong> {{ currentUrl }}</p>
+        <p><strong>Safari iOS:</strong> {{ isSafariIOS ? 'Sim' : 'Não' }}</p>
+        <p><strong>Modo Router:</strong> {{ routerMode }}</p>
+        <p><strong>Tentativas Fallback:</strong> {{ fallbackAttempts }}</p>
+        <p><strong>LocalStorage:</strong></p>
+        <pre>{{ localStorageData }}</pre>
+      </div>
+      
       <div class="error-actions">
         <button @click="goHome" class="btn-primary">
           🏠 Ir para Home
@@ -31,6 +42,10 @@
         
         <button @click="toggleDetails" class="btn-link">
           {{ showDetails ? 'Ocultar' : 'Mostrar' }} detalhes
+        </button>
+        
+        <button @click="forceHashMode" class="btn-warning" v-if="routerMode !== 'Hash Mode'">
+          🔧 Tentar Hash Mode
         </button>
       </div>
       
@@ -56,10 +71,21 @@ const showDetails = ref(false)
 const errorMessage = ref('Página não encontrada ou erro de navegação.')
 const errorDetails = ref('')
 const isSafariIOS = ref(false)
+const userAgent = ref('')
+const currentUrl = ref('')
+const routerMode = ref('')
+const fallbackAttempts = ref(0)
+const localStorageData = ref('')
 
 onMounted(() => {
   // Detectar Safari iOS
   isSafariIOS.value = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
+  
+  // Preencher dados de debug
+  userAgent.value = navigator.userAgent
+  currentUrl.value = window.location.href
+  routerMode.value = window.location.hash.includes('#') ? 'Hash Mode' : 'History Mode'
+  fallbackAttempts.value = parseInt(localStorage.getItem('router_fallback_attempts') || '0')
   
   // Coletar informações de debug
   const debugInfo = {
@@ -69,10 +95,13 @@ onMounted(() => {
     localStorage: {
       safariPath: localStorage.getItem('safari_ios_last_path'),
       safariUser: localStorage.getItem('safari_ios_user_state'),
-      mobileLogs: localStorage.getItem('mobile_debug_logs')
+      mobileLogs: localStorage.getItem('mobile_debug_logs'),
+      fallbackAttempts: localStorage.getItem('router_fallback_attempts'),
+      safariErrors: localStorage.getItem('safari_navigation_errors')
     }
   }
   
+  localStorageData.value = JSON.stringify(debugInfo.localStorage, null, 2)
   errorDetails.value = JSON.stringify(debugInfo, null, 2)
   
   // Log específico para mobile
@@ -109,12 +138,30 @@ const clearSafariState = () => {
     localStorage.removeItem('safari_ios_last_path')
     localStorage.removeItem('safari_ios_user_state')
     localStorage.removeItem('mobile_debug_logs')
+    localStorage.removeItem('router_fallback_attempts')
+    localStorage.removeItem('safari_navigation_errors')
     alert('Estado do Safari limpo! Redirecionando...')
     setTimeout(() => {
       router.push('/login')
     }, 1000)
   } catch (e) {
     console.error('Erro ao limpar estado:', e)
+  }
+}
+
+const forceHashMode = () => {
+  try {
+    // Marcar que deve usar hash mode
+    localStorage.setItem('router_fallback_attempts', '3')
+    localStorage.setItem('safari_navigation_errors', 'true')
+    
+    // Recarregar a página para aplicar hash mode
+    const currentPath = window.location.pathname
+    window.location.href = window.location.origin + '/#' + currentPath
+  } catch (e) {
+    console.error('Erro ao forçar hash mode:', e)
+    // Fallback: apenas recarregar
+    window.location.reload()
   }
 }
 </script>

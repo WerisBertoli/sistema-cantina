@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import ForgotPasswordView from '../views/ForgotPasswordView.vue'
@@ -46,6 +46,43 @@ const recoverSafariIOSState = () => {
   return null
 }
 
+// Detectar se há problemas de navegação e usar hash mode como fallback
+const shouldUseHashMode = () => {
+  // Verificar se já houve tentativas de fallback
+  const fallbackAttempts = parseInt(localStorage.getItem('router_fallback_attempts') || '0')
+  
+  // Se já tentou várias vezes com history mode, usar hash mode
+  if (fallbackAttempts >= 2) {
+    mobileLog('Usando hash mode devido a múltiplas falhas de navegação')
+    return true
+  }
+  
+  // Para Safari iOS, usar hash mode se detectar problemas
+  if (isSafariIOS) {
+    const hasNavigationErrors = localStorage.getItem('safari_navigation_errors')
+    if (hasNavigationErrors) {
+      mobileLog('Usando hash mode para Safari iOS devido a erros de navegação')
+      return true
+    }
+  }
+  
+  return false
+}
+
+// Incrementar contador de tentativas de fallback
+const incrementFallbackAttempts = () => {
+  const attempts = parseInt(localStorage.getItem('router_fallback_attempts') || '0')
+  localStorage.setItem('router_fallback_attempts', (attempts + 1).toString())
+  mobileLog(`Incrementando tentativas de fallback: ${attempts + 1}`)
+}
+
+// Limpar contadores quando navegação funciona
+const clearFallbackAttempts = () => {
+  localStorage.removeItem('router_fallback_attempts')
+  localStorage.removeItem('safari_navigation_errors')
+  mobileLog('Limpando contadores de fallback - navegação funcionando')
+}
+
 // Salvar estado para Safari iOS
 const saveSafariIOSState = (path: string, isAuthenticated: boolean) => {
   if (isSafariIOS) {
@@ -59,8 +96,12 @@ const saveSafariIOSState = (path: string, isAuthenticated: boolean) => {
   }
 }
 
+// Criar router com history mode apropriado
+const useHashMode = shouldUseHashMode()
+mobileLog(`Criando router com modo: ${useHashMode ? 'hash' : 'history'}`)
+
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: useHashMode ? createWebHashHistory(import.meta.env.BASE_URL) : createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
@@ -187,20 +228,24 @@ router.beforeEach((to, from, next) => {
       if (requiresAuth && !currentUser) {
         mobileLog('Redirecionando para login (requiresAuth)')
         saveSafariIOSState('/login', false)
+        clearFallbackAttempts()
         next('/login')
       } else if (requiresGuest && currentUser) {
         if (to.name === 'login' && from.name === 'forgot-password') {
           mobileLog('Permitindo navegação login <- forgot-password')
           saveSafariIOSState(to.path, !!currentUser)
+          clearFallbackAttempts()
           next()
         } else {
           mobileLog('Redirecionando para home (requiresGuest + user)')
           saveSafariIOSState('/home', true)
+          clearFallbackAttempts()
           next('/home')
         }
       } else {
         mobileLog('Permitindo navegação normal')
         saveSafariIOSState(to.path, !!currentUser)
+        clearFallbackAttempts()
         next()
       }
     })
@@ -214,23 +259,27 @@ router.beforeEach((to, from, next) => {
     // Rota protegida e usuário não autenticado
     mobileLog('Rota protegida sem usuário, redirecionando para login')
     saveSafariIOSState('/login', false)
+    clearFallbackAttempts()
     next('/login')
   } else if (requiresGuest && currentUser) {
     // Permitir acesso ao login se vier da página de esqueci a senha
     if (to.name === 'login' && from.name === 'forgot-password') {
       mobileLog('Permitindo login <- forgot-password')
       saveSafariIOSState(to.path, !!currentUser)
+      clearFallbackAttempts()
       next()
     } else {
       // Rota de convidado e usuário já autenticado
       mobileLog('Rota de convidado com usuário, redirecionando para home')
       saveSafariIOSState('/home', true)
+      clearFallbackAttempts()
       next('/home')
     }
   } else {
     // Permitir navegação
     mobileLog('Permitindo navegação livre')
     saveSafariIOSState(to.path, !!currentUser)
+    clearFallbackAttempts()
     next()
   }
 })
@@ -238,6 +287,27 @@ router.beforeEach((to, from, next) => {
 // Tratamento de erros de navegação
 router.onError((error) => {
   mobileLog('Erro de navegação capturado', { error: error.message, stack: error.stack })
+  
+  // Marcar que houve erro de navegação
+  incrementFallbackAttempts()
+  
+  // Para Safari iOS, marcar erro específico
+  if (isSafariIOS) {
+    localStorage.setItem('safari_navigation_errors', 'true')
+    mobileLog('Marcando erro de navegação Safari iOS')
+  }
+  
+  // Se não estamos usando hash mode ainda, tentar recarregar com hash mode
+  const currentMode = router.options.history.base
+  const isCurrentlyHashMode = window.location.hash.includes('#')
+  
+  if (!isCurrentlyHashMode && shouldUseHashMode()) {
+    mobileLog('Tentando fallback para hash mode devido a erro')
+    // Recarregar a página para aplicar hash mode
+    const currentPath = window.location.pathname
+    window.location.href = window.location.origin + '/#' + currentPath
+    return
+  }
   
   // Se for Safari iOS e houver erro, tentar recuperar estado
   if (isSafariIOS) {
