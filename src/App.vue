@@ -14,21 +14,26 @@ import WeeklyHistoryModal from './components/modals/WeeklyHistoryModal.vue'
 
 const store = useAppStore()
 const isAuthLoading = ref(true)
+const isAppInitialized = ref(false)
 
 // Computed para verificar se ainda está carregando (auth ou app)
-const isLoading = computed(() => store.isLoading || isAuthLoading.value)
+const isLoading = computed(() => store.isLoading || isAuthLoading.value || !isAppInitialized.value)
 
-// Verificar estado de autenticação periodicamente
-const checkAuthState = () => {
-  isAuthLoading.value = getAuthLoadingState()
-  if (isAuthLoading.value) {
-    setTimeout(checkAuthState, 100) // Verificar a cada 100ms
+// Aguardar autenticação e inicialização da app
+const initializeApp = async () => {
+  // Aguardar autenticação
+  while (getAuthLoadingState()) {
+    await new Promise(resolve => setTimeout(resolve, 50))
   }
+  isAuthLoading.value = false
+  
+  // Inicializar store
+  await store.initializeApp()
+  isAppInitialized.value = true
 }
 
-onMounted(async () => {
-  checkAuthState() // Iniciar verificação de auth
-  await store.initializeApp()
+onMounted(() => {
+  initializeApp()
 })
 </script>
 

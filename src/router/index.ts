@@ -10,7 +10,27 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/login'
+      redirect: '/login',
+      beforeEnter: (to, from, next) => {
+        // Se a autenticação ainda não foi inicializada, aguardar
+        if (!authInitialized) {
+          const unsubscribe = onAuthStateChanged(auth, (user) => {
+            unsubscribe()
+            if (user) {
+              next('/home')
+            } else {
+              next('/login')
+            }
+          })
+        } else {
+          // Autenticação já inicializada, redirecionar baseado no estado atual
+          if (currentUser) {
+            next('/home')
+          } else {
+            next('/login')
+          }
+        }
+      }
     },
     {
       path: '/login',

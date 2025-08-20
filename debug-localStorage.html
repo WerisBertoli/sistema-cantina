@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug localStorage - Sistema Cantina</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        pre {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .clear-btn {
+            background: #dc3545;
+        }
+        .clear-btn:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Debug localStorage - Sistema Cantina</h1>
+        
+        <div class="section">
+            <h3>localStorage Atual</h3>
+            <button class="button" onclick="refreshLocalStorage()">Atualizar</button>
+            <button class="button clear-btn" onclick="clearLocalStorage()">Limpar localStorage</button>
+            <pre id="localStorage-content"></pre>
+        </div>
+        
+        <div class="section">
+            <h3>sessionStorage Atual</h3>
+            <button class="button" onclick="refreshSessionStorage()">Atualizar</button>
+            <button class="button clear-btn" onclick="clearSessionStorage()">Limpar sessionStorage</button>
+            <pre id="sessionStorage-content"></pre>
+        </div>
+        
+        <div class="section">
+            <h3>Cookies</h3>
+            <button class="button" onclick="refreshCookies()">Atualizar</button>
+            <pre id="cookies-content"></pre>
+        </div>
+        
+        <div class="section">
+            <h3>IndexedDB (Firebase)</h3>
+            <button class="button" onclick="checkIndexedDB()">Verificar IndexedDB</button>
+            <pre id="indexeddb-content"></pre>
+        </div>
+        
+        <div class="section">
+            <h3>Ações de Teste</h3>
+            <button class="button" onclick="testFirebaseAuth()">Testar Estado Firebase Auth</button>
+            <button class="button" onclick="simulateLogin()">Simular Dados de Login</button>
+            <pre id="test-results"></pre>
+        </div>
+    </div>
+
+    <script>
+        function refreshLocalStorage() {
+            const content = document.getElementById('localStorage-content');
+            const data = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                data[key] = localStorage.getItem(key);
+            }
+            content.textContent = JSON.stringify(data, null, 2);
+        }
+        
+        function refreshSessionStorage() {
+            const content = document.getElementById('sessionStorage-content');
+            const data = {};
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                data[key] = sessionStorage.getItem(key);
+            }
+            content.textContent = JSON.stringify(data, null, 2);
+        }
+        
+        function refreshCookies() {
+            const content = document.getElementById('cookies-content');
+            content.textContent = document.cookie || 'Nenhum cookie encontrado';
+        }
+        
+        function clearLocalStorage() {
+            localStorage.clear();
+            refreshLocalStorage();
+            alert('localStorage limpo!');
+        }
+        
+        function clearSessionStorage() {
+            sessionStorage.clear();
+            refreshSessionStorage();
+            alert('sessionStorage limpo!');
+        }
+        
+        function checkIndexedDB() {
+            const content = document.getElementById('indexeddb-content');
+            
+            if (!window.indexedDB) {
+                content.textContent = 'IndexedDB não suportado neste navegador';
+                return;
+            }
+            
+            // Listar databases do IndexedDB
+            if (indexedDB.databases) {
+                indexedDB.databases().then(databases => {
+                    content.textContent = 'Databases encontradas:\n' + 
+                        databases.map(db => `- ${db.name} (versão ${db.version})`).join('\n');
+                }).catch(err => {
+                    content.textContent = 'Erro ao listar databases: ' + err.message;
+                });
+            } else {
+                content.textContent = 'Método databases() não disponível. Verificando databases conhecidas do Firebase...';
+                
+                // Tentar abrir databases conhecidas do Firebase
+                const firebaseDbs = ['firebaseLocalStorageDb'];
+                let results = [];
+                
+                firebaseDbs.forEach(dbName => {
+                    const request = indexedDB.open(dbName);
+                    request.onsuccess = () => {
+                        results.push(`✓ ${dbName} existe`);
+                        request.result.close();
+                        content.textContent = results.join('\n');
+                    };
+                    request.onerror = () => {
+                        results.push(`✗ ${dbName} não encontrada`);
+                        content.textContent = results.join('\n');
+                    };
+                });
+            }
+        }
+        
+        function testFirebaseAuth() {
+            const content = document.getElementById('test-results');
+            
+            // Verificar se há dados do Firebase no localStorage
+            const firebaseKeys = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.includes('firebase') || key.includes('Firebase')) {
+                    firebaseKeys.push(key);
+                }
+            }
+            
+            let result = 'Chaves relacionadas ao Firebase no localStorage:\n';
+            if (firebaseKeys.length > 0) {
+                firebaseKeys.forEach(key => {
+                    result += `- ${key}: ${localStorage.getItem(key).substring(0, 100)}...\n`;
+                });
+            } else {
+                result += 'Nenhuma chave do Firebase encontrada no localStorage\n';
+            }
+            
+            // Verificar sessionStorage também
+            const sessionFirebaseKeys = [];
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key.includes('firebase') || key.includes('Firebase')) {
+                    sessionFirebaseKeys.push(key);
+                }
+            }
+            
+            result += '\nChaves relacionadas ao Firebase no sessionStorage:\n';
+            if (sessionFirebaseKeys.length > 0) {
+                sessionFirebaseKeys.forEach(key => {
+                    result += `- ${key}: ${sessionStorage.getItem(key).substring(0, 100)}...\n`;
+                });
+            } else {
+                result += 'Nenhuma chave do Firebase encontrada no sessionStorage\n';
+            }
+            
+            content.textContent = result;
+        }
+        
+        function simulateLogin() {
+            // Simular dados que seriam salvos após login
+            localStorage.setItem('rememberedEmail', 'teste@exemplo.com');
+            localStorage.setItem('theme', 'light');
+            
+            alert('Dados de teste adicionados ao localStorage!');
+            refreshLocalStorage();
+        }
+        
+        // Carregar dados iniciais
+        window.onload = function() {
+            refreshLocalStorage();
+            refreshSessionStorage();
+            refreshCookies();
+        };
+    </script>
+</body>
+</html>
