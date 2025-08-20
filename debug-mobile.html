@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Mobile - Sistema Cantina</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 100%;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .log-entry {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 10px;
+            margin: 5px 0;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .status.online {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Mobile - Sistema Cantina</h1>
+        
+        <div class="section">
+            <h3>📱 Informações do Dispositivo</h3>
+            <div id="deviceInfo"></div>
+        </div>
+        
+        <div class="section">
+            <h3>🌐 Status da Conexão</h3>
+            <div id="connectionStatus"></div>
+            <button class="btn" onclick="testConnection()">Testar Conexão</button>
+        </div>
+        
+        <div class="section">
+            <h3>📊 Estado da Aplicação</h3>
+            <div id="appState"></div>
+            <button class="btn" onclick="refreshAppState()">Atualizar Estado</button>
+        </div>
+        
+        <div class="section">
+            <h3>📝 Logs de Debug Mobile</h3>
+            <div id="mobileLogs"></div>
+            <button class="btn" onclick="refreshLogs()">Atualizar Logs</button>
+            <button class="btn btn-danger" onclick="clearLogs()">Limpar Logs</button>
+        </div>
+        
+        <div class="section">
+            <h3>🔧 Ações de Debug</h3>
+            <button class="btn" onclick="simulateReload()">Simular Reload</button>
+            <button class="btn" onclick="testLocalStorage()">Testar localStorage</button>
+            <button class="btn" onclick="exportDebugData()">Exportar Dados</button>
+        </div>
+    </div>
+
+    <script>
+        // Detectar informações do dispositivo
+        function getDeviceInfo() {
+            const info = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                cookieEnabled: navigator.cookieEnabled,
+                onLine: navigator.onLine,
+                screenWidth: screen.width,
+                screenHeight: screen.height,
+                windowWidth: window.innerWidth,
+                windowHeight: window.innerHeight,
+                timestamp: new Date().toISOString()
+            };
+            
+            document.getElementById('deviceInfo').innerHTML = `
+                <div class="log-entry">
+                    <strong>User Agent:</strong> ${info.userAgent}<br>
+                    <strong>Platform:</strong> ${info.platform}<br>
+                    <strong>Language:</strong> ${info.language}<br>
+                    <strong>Cookies:</strong> ${info.cookieEnabled ? '✅ Habilitados' : '❌ Desabilitados'}<br>
+                    <strong>Online:</strong> ${info.onLine ? '✅ Sim' : '❌ Não'}<br>
+                    <strong>Tela:</strong> ${info.screenWidth}x${info.screenHeight}<br>
+                    <strong>Janela:</strong> ${info.windowWidth}x${info.windowHeight}
+                </div>
+            `;
+        }
+        
+        // Testar conexão com o servidor
+        async function testConnection() {
+            const statusDiv = document.getElementById('connectionStatus');
+            statusDiv.innerHTML = '<div class="log-entry">🔄 Testando conexão...</div>';
+            
+            try {
+                const response = await fetch('http://192.168.18.88:5173/', { 
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                statusDiv.innerHTML = '<div class="log-entry success">✅ Conexão OK com o servidor</div>';
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="log-entry error">❌ Erro de conexão: ${error.message}</div>`;
+            }
+        }
+        
+        // Atualizar estado da aplicação
+        function refreshAppState() {
+            const state = {
+                localStorage: {
+                    keys: Object.keys(localStorage),
+                    mobileLogs: localStorage.getItem('mobile_debug_logs'),
+                    authData: localStorage.getItem('firebase:authUser:AIzaSyBxxx') // Exemplo
+                },
+                sessionStorage: {
+                    keys: Object.keys(sessionStorage)
+                },
+                url: window.location.href,
+                timestamp: new Date().toISOString()
+            };
+            
+            document.getElementById('appState').innerHTML = `
+                <div class="log-entry">
+                    <strong>URL Atual:</strong> ${state.url}<br>
+                    <strong>localStorage Keys:</strong> ${state.localStorage.keys.join(', ') || 'Nenhuma'}<br>
+                    <strong>sessionStorage Keys:</strong> ${state.sessionStorage.keys.join(', ') || 'Nenhuma'}<br>
+                    <strong>Mobile Logs:</strong> ${state.localStorage.mobileLogs ? 'Presentes' : 'Ausentes'}
+                </div>
+            `;
+        }
+        
+        // Atualizar logs de debug mobile
+        function refreshLogs() {
+            const logs = JSON.parse(localStorage.getItem('mobile_debug_logs') || '[]');
+            const logsDiv = document.getElementById('mobileLogs');
+            
+            if (logs.length === 0) {
+                logsDiv.innerHTML = '<div class="log-entry">📭 Nenhum log encontrado</div>';
+                return;
+            }
+            
+            const logsHtml = logs.slice(-20).reverse().map(log => {
+                const timestamp = new Date(log.timestamp).toLocaleString('pt-BR');
+                const data = log.data ? JSON.stringify(log.data, null, 2) : '';
+                return `
+                    <div class="log-entry">
+                        <div class="timestamp">${timestamp}</div>
+                        <strong>${log.message}</strong>
+                        ${data ? `<pre style="margin: 5px 0; font-size: 11px;">${data}</pre>` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            logsDiv.innerHTML = logsHtml;
+        }
+        
+        // Limpar logs
+        function clearLogs() {
+            localStorage.removeItem('mobile_debug_logs');
+            refreshLogs();
+        }
+        
+        // Simular reload da página
+        function simulateReload() {
+            window.location.reload();
+        }
+        
+        // Testar localStorage
+        function testLocalStorage() {
+            try {
+                const testKey = 'debug_test_' + Date.now();
+                localStorage.setItem(testKey, 'test_value');
+                const value = localStorage.getItem(testKey);
+                localStorage.removeItem(testKey);
+                
+                alert(value === 'test_value' ? '✅ localStorage funcionando' : '❌ localStorage com problema');
+            } catch (error) {
+                alert('❌ Erro no localStorage: ' + error.message);
+            }
+        }
+        
+        // Exportar dados de debug
+        function exportDebugData() {
+            const data = {
+                deviceInfo: {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    language: navigator.language,
+                    onLine: navigator.onLine
+                },
+                localStorage: Object.keys(localStorage).reduce((acc, key) => {
+                    acc[key] = localStorage.getItem(key);
+                    return acc;
+                }, {}),
+                sessionStorage: Object.keys(sessionStorage).reduce((acc, key) => {
+                    acc[key] = sessionStorage.getItem(key);
+                    return acc;
+                }, {}),
+                url: window.location.href,
+                timestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `debug-mobile-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            getDeviceInfo();
+            refreshAppState();
+            refreshLogs();
+            testConnection();
+            
+            // Atualizar logs automaticamente a cada 5 segundos
+            setInterval(refreshLogs, 5000);
+        });
+        
+        // Monitorar mudanças de conectividade
+        window.addEventListener('online', function() {
+            document.getElementById('connectionStatus').innerHTML = 
+                '<div class="log-entry success">✅ Conexão restaurada</div>';
+        });
+        
+        window.addEventListener('offline', function() {
+            document.getElementById('connectionStatus').innerHTML = 
+                '<div class="log-entry error">❌ Conexão perdida</div>';
+        });
+    </script>
+</body>
+</html>
