@@ -3,7 +3,33 @@
     class="bg-white dark:bg-gray-900 pb-6 sm:pb-8"
     style="overflow-x: hidden !important; max-width: 100vw; width: 100%"
   >
-
+    <div class="px-3 pt-3 pb-2 sm:px-4 sm:pt-4 bg-white dark:bg-gray-900">
+      <div class="mb-4 sm:mb-6 flex justify-center sm:hidden">
+        <div class="search-container relative w-full max-w-md">
+          <input
+            v-model="searchTerm"
+            type="text"
+            class="search-input modern-search-input w-full px-4 py-2 sm:py-3 text-sm sm:text-base"
+            placeholder="Buscar aluno..."
+          />
+          <button
+            @click="store.openModal('addStudent')"
+            class="add-student-button w-12 h-12 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center flex-shrink-0"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <div
       v-if="filteredStudents.length === 0"
@@ -22,7 +48,9 @@
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center flex-1 min-w-0">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+            <div
+              class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
+            >
               {{ student.name.charAt(0).toUpperCase() }}
             </div>
             <div class="ml-3 flex-1 min-w-0">
@@ -68,10 +96,14 @@
 
     <!-- Layout para Desktop (Tabela) -->
     <div class="hidden sm:block relative overflow-x-auto shadow-md sm:rounded-lg">
-      <div class="flex items-center justify-end flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
+      <div
+        class="flex items-center justify-end flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900"
+      >
         <label for="table-search" class="sr-only">Search</label>
         <div class="relative">
-          <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+          <div
+            class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none"
+          >
             <svg
               class="w-4 h-4 text-gray-500 dark:text-gray-400"
               aria-hidden="true"
@@ -98,7 +130,9 @@
         </div>
       </div>
       <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <thead
+          class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+        >
           <tr>
             <th scope="col" class="px-4 py-3">Nome</th>
             <th scope="col" class="px-3 py-3">Saldo</th>
@@ -112,13 +146,20 @@
             class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
             @click="selectStudent(student)"
           >
-            <th scope="row" class="flex items-center px-4 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-              <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
+            <th
+              scope="row"
+              class="flex items-center px-4 py-4 text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              <div
+                class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs"
+              >
                 {{ student.name.charAt(0).toUpperCase() }}
               </div>
               <div class="ps-2">
                 <div class="text-sm font-semibold">{{ student.name }}</div>
-                <div class="font-normal text-gray-500 text-xs" v-if="student.parentName">{{ student.parentName }}</div>
+                <div class="font-normal text-gray-500 text-xs" v-if="student.parentName">
+                  {{ student.parentName }}
+                </div>
               </div>
             </th>
             <td class="px-3 py-4">
@@ -139,13 +180,13 @@
               </div>
             </td>
             <td class="px-2 py-4">
-               <button
-                 @click.stop="store.openModal('consumption', student)"
-                 class="px-2 py-1 text-xs font-medium text-white bg-blue-700 rounded hover:bg-blue-800 focus:ring-2 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-               >
-                 Consumo
-               </button>
-             </td>
+              <button
+                @click.stop="store.openModal('consumption', student)"
+                class="px-2 py-1 text-xs font-medium text-white bg-blue-700 rounded hover:bg-blue-800 focus:ring-2 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Consumo
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>

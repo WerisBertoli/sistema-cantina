@@ -1,6 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Student, Product, Transaction, CartItem, Earnings, ModalState, PrepaidOrder } from '@/types'
+import type {
+  Student,
+  Product,
+  Transaction,
+  CartItem,
+  Earnings,
+  ModalState,
+  PrepaidOrder,
+} from '@/types'
 import { BalanceStatus } from '@/types'
 import {
   collection,
@@ -12,7 +20,7 @@ import {
   orderBy,
   Timestamp,
   writeBatch,
-  deleteDoc
+  deleteDoc,
 } from 'firebase/firestore'
 import { db, auth } from '@/firebase'
 
@@ -101,7 +109,7 @@ export const useAppStore = defineStore('app', () => {
           }
         }
       }
-      
+
       console.log('🔄 Inicializando aplicação...')
       isAuthenticated.value = true
 
@@ -141,47 +149,62 @@ export const useAppStore = defineStore('app', () => {
       products.value = snapshot.docs.map((doc) => {
         const data = doc.data()
         const productName = (data.nome || data.name || '').toLowerCase()
-        
+
         // Usar categoria do Firebase se disponível, senão determinar baseada no nome
         let category: 'bebida' | 'lanche' | 'doce' = data.category || 'doce'
-        
+
         // Se não há categoria no Firebase, determinar baseada no nome do produto
         if (!data.category) {
           // Lanches específicos
-          if (productName.includes('cachorro quente') || 
-              productName.includes('pipoca doce') || 
-              productName.includes('biscoito teens chips yokitos') || 
-              productName.includes('misto') || 
-              productName.includes('passatempo') ||
-              productName.includes('sanduíche') || productName.includes('hambúrguer') ||
-              productName.includes('pizza') || productName.includes('pastel') ||
-              productName.includes('coxinha') || productName.includes('pão') ||
-              productName.includes('lanche') || productName.includes('salgado') ||
-              productName.includes('empada') || productName.includes('esfirra')) {
+          if (
+            productName.includes('cachorro quente') ||
+            productName.includes('pipoca doce') ||
+            productName.includes('biscoito teens chips yokitos') ||
+            productName.includes('misto') ||
+            productName.includes('passatempo') ||
+            productName.includes('sanduíche') ||
+            productName.includes('hambúrguer') ||
+            productName.includes('pizza') ||
+            productName.includes('pastel') ||
+            productName.includes('coxinha') ||
+            productName.includes('pão') ||
+            productName.includes('lanche') ||
+            productName.includes('salgado') ||
+            productName.includes('empada') ||
+            productName.includes('esfirra')
+          ) {
             category = 'lanche'
           }
           // Bebidas específicas
-          else if (productName.includes('toddynho') || 
-                   productName.includes('refrigerante lata') || 
-                   productName.includes('guaravita') ||
-                   productName.includes('suco') || productName.includes('água') || 
-                   productName.includes('refrigerante') || productName.includes('coca') ||
-                   productName.includes('pepsi') || productName.includes('guaraná') ||
-                   productName.includes('fanta') || productName.includes('sprite') ||
-                   productName.includes('bebida') || productName.includes('café') ||
-                   productName.includes('chá') || productName.includes('leite')) {
+          else if (
+            productName.includes('toddynho') ||
+            productName.includes('refrigerante lata') ||
+            productName.includes('guaravita') ||
+            productName.includes('suco') ||
+            productName.includes('água') ||
+            productName.includes('refrigerante') ||
+            productName.includes('coca') ||
+            productName.includes('pepsi') ||
+            productName.includes('guaraná') ||
+            productName.includes('fanta') ||
+            productName.includes('sprite') ||
+            productName.includes('bebida') ||
+            productName.includes('café') ||
+            productName.includes('chá') ||
+            productName.includes('leite')
+          ) {
             category = 'bebida'
           }
           // Todos os outros produtos (incluindo doces, chocolates, balas, etc.) ficam como 'doce'
         }
-        
+
         const product = {
           id: doc.id,
           name: data.nome || data.name,
           price: data.preco || data.price || 0,
           imageUrl: data.imagem,
           category: category,
-          active: data.active !== false // Default to true if not specified
+          active: data.active !== false, // Default to true if not specified
         } as Product
         console.log('Produto carregado:', product)
         return product
@@ -210,7 +233,10 @@ export const useAppStore = defineStore('app', () => {
     })
 
     // Carregar pedidos pré-pagos
-    const prepaidOrdersQuery = query(collection(db, 'prepaidTransactions'), orderBy('createdAt', 'desc'))
+    const prepaidOrdersQuery = query(
+      collection(db, 'prepaidTransactions'),
+      orderBy('createdAt', 'desc'),
+    )
     onSnapshot(prepaidOrdersQuery, (snapshot) => {
       prepaidOrders.value = snapshot.docs.map(
         (doc) =>
@@ -219,7 +245,9 @@ export const useAppStore = defineStore('app', () => {
             ...doc.data(),
           }) as PrepaidOrder,
       )
-      console.log(`Carregados ${prepaidOrders.value.length} pedidos pré-pagos da coleção 'prepaidTransactions'`)
+      console.log(
+        `Carregados ${prepaidOrders.value.length} pedidos pré-pagos da coleção 'prepaidTransactions'`,
+      )
     })
   }
 
@@ -316,11 +344,11 @@ export const useAppStore = defineStore('app', () => {
       if (!auth.currentUser) {
         throw new Error('Usuário não autenticado. Não é possível deletar o produto.')
       }
-      
+
       // Deletar do Firestore
       const productRef = doc(db, 'produtos', productId)
       await deleteDoc(productRef)
-      
+
       console.log('✅ Produto deletado com sucesso')
     } catch (error) {
       console.error('❌ Erro ao deletar produto:', error)
@@ -399,9 +427,9 @@ export const useAppStore = defineStore('app', () => {
 
       const total = cartTotal.value
       const newBalance = student.balance - total
-      
+
       // Verificar se excede o limite de saldo negativo
-      if (newBalance < -12.00) {
+      if (newBalance < -12.0) {
         throw new Error('Limite de saldo negativo atingido! Máximo permitido: -R$ 12,00')
       }
 
@@ -575,19 +603,19 @@ export const useAppStore = defineStore('app', () => {
       const orderRef = doc(db, 'prepaidTransactions', orderId)
       const updateData = {
         status: 'picked_up' as const,
-        pickedUpAt: Timestamp.now()
+        pickedUpAt: Timestamp.now(),
       }
-      
+
       await updateDoc(orderRef, updateData)
-      
-      const orderIndex = prepaidOrders.value.findIndex(order => order.id === orderId)
+
+      const orderIndex = prepaidOrders.value.findIndex((order) => order.id === orderId)
       if (orderIndex !== -1) {
         prepaidOrders.value[orderIndex] = {
           ...prepaidOrders.value[orderIndex],
-          ...updateData
+          ...updateData,
         }
       }
-      
+
       console.log('Pedido marcado como retirado:', orderId)
     } catch (error) {
       console.error('Erro ao marcar pedido como retirado:', error)
@@ -596,31 +624,31 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const getPendingOrdersByStudent = (studentId: string) => {
-    return prepaidOrders.value.filter(order => 
-      order.studentId === studentId && order.status === 'pending'
+    return prepaidOrders.value.filter(
+      (order) => order.studentId === studentId && order.status === 'pending',
     )
   }
 
   const getAllOrdersByStudent = (studentId: string) => {
-    return prepaidOrders.value.filter(order => order.studentId === studentId)
+    return prepaidOrders.value.filter((order) => order.studentId === studentId)
   }
 
   const clearAllPrepaidOrders = async () => {
     try {
       // Limpar todos os pedidos do Firestore
       const batch = writeBatch(db)
-      prepaidOrders.value.forEach(order => {
+      prepaidOrders.value.forEach((order) => {
         if (order.id) {
           const orderRef = doc(db, 'prepaidTransactions', order.id)
           batch.delete(orderRef)
         }
       })
-      
+
       await batch.commit()
-      
+
       // Limpar o array local
       prepaidOrders.value = []
-      
+
       console.log('Todos os pedidos pré-pagos foram removidos')
     } catch (error) {
       console.error('Erro ao limpar pedidos pré-pagos:', error)
@@ -633,17 +661,17 @@ export const useAppStore = defineStore('app', () => {
       if (!auth.currentUser) {
         throw new Error('Usuário não autenticado. Não é possível deletar o pedido.')
       }
-      
+
       // Deletar do Firestore
       const orderRef = doc(db, 'prepaidTransactions', orderId)
       await deleteDoc(orderRef)
-      
+
       // Remover do array local
-      const index = prepaidOrders.value.findIndex(order => order.id === orderId)
+      const index = prepaidOrders.value.findIndex((order) => order.id === orderId)
       if (index !== -1) {
         prepaidOrders.value.splice(index, 1)
       }
-      
+
       console.log('✅ Pedido deletado com sucesso')
     } catch (error) {
       console.error('❌ Erro ao deletar pedido:', error)
