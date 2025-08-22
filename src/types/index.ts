@@ -50,6 +50,19 @@ export interface Earnings {
   thisMonth: number
 }
 
+// Interface para pedidos pré-pagos
+export interface PrepaidOrder {
+  id?: string
+  studentId: string
+  studentName: string
+  items: TransactionItem[]
+  totalValue: number
+  status: 'pending' | 'picked_up'
+  createdAt: Timestamp
+  pickedUpAt?: Timestamp
+  notes?: string
+}
+
 // Enum para status de saldo
 export enum BalanceStatus {
   NORMAL = 'normal',
@@ -65,11 +78,11 @@ export interface NavigationTab {
 }
 
 // Tipo para abas de navegação
-export type NavigationTabType = 'students' | 'earnings' | 'products' | 'todo'
+export type NavigationTabType = 'students' | 'earnings' | 'products' | 'todo' | 'orders'
 
 // Interface para modal
 export interface ModalState {
   isOpen: boolean
-  type: 'addStudent' | 'addCredit' | 'consumption' | 'quickConsumption' | 'message' | 'weeklyHistory' | 'editStudent' | null
-  data?: Student | TransactionItem[] | { student: Student } | { type: string } | any
+  type: 'addStudent' | 'addCredit' | 'consumption' | 'quickConsumption' | 'message' | 'weeklyHistory' | 'editStudent' | 'addPrepaidOrder' | null
+  data?: Student | TransactionItem[] | { student: Student } | { type: string } | PrepaidOrder | any
 }

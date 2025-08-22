@@ -11,6 +11,7 @@ import ConsumptionModal from './components/modals/ConsumptionModal.vue'
 import QuickConsumptionModal from './components/modals/QuickConsumptionModal.vue'
 import MessageModal from './components/modals/MessageModal.vue'
 import WeeklyHistoryModal from './components/modals/WeeklyHistoryModal.vue'
+import AddPrepaidOrderModal from './components/AddPrepaidOrderModal.vue'
 
 const store = useAppStore()
 const isAuthLoading = ref(true)
@@ -83,6 +84,11 @@ onMounted(() => {
 
     <WeeklyHistoryModal
       v-if="store.modal.isOpen && store.modal.type === 'weeklyHistory'"
+      @close="store.closeModal"
+    />
+
+    <AddPrepaidOrderModal
+      v-if="store.modal.isOpen && store.modal.type === 'addPrepaidOrder'"
       @close="store.closeModal"
     />
   </div>

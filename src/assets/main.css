@@ -285,6 +285,14 @@ html, body {
   gap: 6px;
 }
 
+.quantity-display {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  min-width: 20px;
+  text-align: center;
+}
+
 .action-btn {
   overflow: hidden;
   display: inline-flex;

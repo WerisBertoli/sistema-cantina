@@ -7,7 +7,9 @@ import { auth } from '../firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 
 // Detectar se é dispositivo móvel
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+  navigator.userAgent,
+)
 const isSafariIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
 
 // Função para logs específicos de mobile
@@ -32,9 +34,9 @@ const recoverSafariIOSState = () => {
       // Verificar se há dados de sessão salvos
       const savedPath = localStorage.getItem('safari_ios_last_path')
       const savedUser = localStorage.getItem('safari_ios_user_state')
-      
+
       mobileLog('Tentando recuperar estado Safari iOS', { savedPath, hasUser: !!savedUser })
-      
+
       if (savedPath && savedUser === 'authenticated') {
         mobileLog('Estado recuperado: usuário autenticado, redirecionando para', savedPath)
         return savedPath
@@ -50,13 +52,13 @@ const recoverSafariIOSState = () => {
 const shouldUseHashMode = () => {
   // Verificar se já houve tentativas de fallback
   const fallbackAttempts = parseInt(localStorage.getItem('router_fallback_attempts') || '0')
-  
+
   // Se já tentou várias vezes com history mode, usar hash mode
   if (fallbackAttempts >= 2) {
     mobileLog('Usando hash mode devido a múltiplas falhas de navegação')
     return true
   }
-  
+
   // Para Safari iOS, usar hash mode se detectar problemas
   if (isSafariIOS) {
     const hasNavigationErrors = localStorage.getItem('safari_navigation_errors')
@@ -65,7 +67,7 @@ const shouldUseHashMode = () => {
       return true
     }
   }
-  
+
   return false
 }
 
@@ -101,14 +103,20 @@ const useHashMode = shouldUseHashMode()
 mobileLog(`Criando router com modo: ${useHashMode ? 'hash' : 'history'}`)
 
 const router = createRouter({
-  history: useHashMode ? createWebHashHistory(import.meta.env.BASE_URL) : createWebHistory(import.meta.env.BASE_URL),
+  history: useHashMode
+    ? createWebHashHistory(import.meta.env.BASE_URL)
+    : createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
       redirect: '/login',
       beforeEnter: (to, from, next) => {
-        mobileLog('Rota raiz acessada', { from: from.path, authInitialized, currentUser: !!currentUser })
-        
+        mobileLog('Rota raiz acessada', {
+          from: from.path,
+          authInitialized,
+          currentUser: !!currentUser,
+        })
+
         // Tentar recuperar estado do Safari iOS primeiro
         const recoveredPath = recoverSafariIOSState()
         if (recoveredPath && recoveredPath !== '/') {
@@ -116,7 +124,7 @@ const router = createRouter({
           next(recoveredPath)
           return
         }
-        
+
         // Se a autenticação ainda não foi inicializada, aguardar
         if (!authInitialized) {
           mobileLog('Aguardando inicialização da autenticação')
@@ -145,41 +153,41 @@ const router = createRouter({
             next('/login')
           }
         }
-      }
+      },
     },
     {
       path: '/login',
       name: 'login',
       component: LoginView,
-      meta: { requiresGuest: true }
+      meta: { requiresGuest: true },
     },
     {
       path: '/forgot-password',
       name: 'forgot-password',
-      component: ForgotPasswordView
+      component: ForgotPasswordView,
     },
     {
       path: '/home',
       name: 'home',
       component: HomeView,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: '/tarefas',
       name: 'tarefas',
       component: () => import('../components/TodoListView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: '/error',
       name: 'error',
-      component: ErrorView
+      component: ErrorView,
     },
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
-      component: ErrorView
-    }
+      component: ErrorView,
+    },
   ],
 })
 
@@ -190,11 +198,18 @@ let isAuthLoading = true
 
 // Listener global para mudanças no estado de autenticação
 onAuthStateChanged(auth, (user) => {
-  mobileLog('onAuthStateChanged global executado', { user: !!user, wasInitialized: authInitialized })
+  mobileLog('onAuthStateChanged global executado', {
+    user: !!user,
+    wasInitialized: authInitialized,
+  })
   currentUser = user
   authInitialized = true
   isAuthLoading = false
-  mobileLog('Estado de auth atualizado', { authInitialized, isAuthLoading, currentUser: !!currentUser })
+  mobileLog('Estado de auth atualizado', {
+    authInitialized,
+    isAuthLoading,
+    currentUser: !!currentUser,
+  })
 })
 
 // Função para verificar se a autenticação está carregando
@@ -202,18 +217,18 @@ export const getAuthLoadingState = () => isAuthLoading
 
 // Guard de navegação para autenticação
 router.beforeEach((to, from, next) => {
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-  const requiresGuest = to.matched.some(record => record.meta.requiresGuest)
-  
-  mobileLog('beforeEach executado', { 
-    to: to.path, 
-    from: from.path, 
-    requiresAuth, 
-    requiresGuest, 
-    authInitialized, 
-    currentUser: !!currentUser 
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+  const requiresGuest = to.matched.some((record) => record.meta.requiresGuest)
+
+  mobileLog('beforeEach executado', {
+    to: to.path,
+    from: from.path,
+    requiresAuth,
+    requiresGuest,
+    authInitialized,
+    currentUser: !!currentUser,
   })
-  
+
   // Se a autenticação ainda não foi inicializada, aguardar
   if (!authInitialized) {
     mobileLog('Auth não inicializada, aguardando...')
@@ -221,9 +236,9 @@ router.beforeEach((to, from, next) => {
       currentUser = user
       authInitialized = true
       unsubscribe() // Remove o listener após a primeira verificação
-      
+
       mobileLog('Auth inicializada no beforeEach', { user: !!user })
-      
+
       // Reexecutar a lógica de navegação
       if (requiresAuth && !currentUser) {
         mobileLog('Redirecionando para login (requiresAuth)')
@@ -251,10 +266,10 @@ router.beforeEach((to, from, next) => {
     })
     return // Sair da função e aguardar o callback
   }
-  
+
   // Lógica normal de navegação quando a autenticação já foi inicializada
   mobileLog('Auth já inicializada, aplicando lógica normal')
-  
+
   if (requiresAuth && !currentUser) {
     // Rota protegida e usuário não autenticado
     mobileLog('Rota protegida sem usuário, redirecionando para login')
@@ -287,20 +302,20 @@ router.beforeEach((to, from, next) => {
 // Tratamento de erros de navegação
 router.onError((error) => {
   mobileLog('Erro de navegação capturado', { error: error.message, stack: error.stack })
-  
+
   // Marcar que houve erro de navegação
   incrementFallbackAttempts()
-  
+
   // Para Safari iOS, marcar erro específico
   if (isSafariIOS) {
     localStorage.setItem('safari_navigation_errors', 'true')
     mobileLog('Marcando erro de navegação Safari iOS')
   }
-  
+
   // Se não estamos usando hash mode ainda, tentar recarregar com hash mode
   const currentMode = router.options.history.base
   const isCurrentlyHashMode = window.location.hash.includes('#')
-  
+
   if (!isCurrentlyHashMode && shouldUseHashMode()) {
     mobileLog('Tentando fallback para hash mode devido a erro')
     // Recarregar a página para aplicar hash mode
@@ -308,7 +323,7 @@ router.onError((error) => {
     window.location.href = window.location.origin + '/#' + currentPath
     return
   }
-  
+
   // Se for Safari iOS e houver erro, tentar recuperar estado
   if (isSafariIOS) {
     const recoveredPath = recoverSafariIOSState()
@@ -321,7 +336,7 @@ router.onError((error) => {
       return
     }
   }
-  
+
   // Redirecionar para página de erro
   router.push('/error').catch(() => {
     // Se até mesmo a página de erro falhar, recarregar a página

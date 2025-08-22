@@ -59,9 +59,15 @@
           <span class="font-medium dark:text-white">Total:</span>
           <span class="font-bold dark:text-white">{{ store.formatCurrency(store.cartTotal) }}</span>
         </div>
-        <div class="flex justify-between items-center text-sm">
-          <span class="dark:text-gray-200">Novo saldo:</span>
-          <span :class="getNewBalanceClass()">{{ store.formatCurrency(newBalance) }}</span>
+        <div
+          class="mt-2 p-2 rounded-xl border border-white/10 dark:border-white/20 shadow-[0_8px_32px_rgba(59,130,246,0.25)] dark:shadow-[0_8px_32px_rgba(59,130,246,0.3)]"
+          :class="newBalance < 0 ? 'bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700' : 'bg-gradient-to-br from-blue-500 to-cyan-500 dark:from-blue-600 dark:to-cyan-600'"
+        >
+          <p class="text-sm text-white/90">Novo saldo:</p>
+          <p class="font-medium text-white">{{ store.formatCurrency(newBalance) }}</p>
+          <p v-if="newBalance < 0 && newBalance >= -12.00" class="text-xs text-white/80 mt-1">
+            ⚠️ Saldo negativo - Os pais serão notificados
+          </p>
         </div>
       </div>
       
@@ -80,7 +86,7 @@
         </button>
         <button 
           @click="handleQuickSubmit"
-          :disabled="isSubmitting || store.cartTotal === 0 || newBalance < 0"
+          :disabled="isSubmitting || store.cartTotal === 0 || newBalance < -12.00"
           class="animated-button"
         >
           <span>{{ isSubmitting ? 'Processando...' : 'Confirmar' }}</span>
@@ -162,8 +168,8 @@ const openFullModal = () => {
 const handleQuickSubmit = async () => {
   if (isSubmitting.value || !currentStudent.value || store.cartTotal === 0) return
   
-  if (newBalance.value < 0) {
-    alert('Saldo insuficiente para esta compra!')
+  if (newBalance.value < -12.00) {
+    alert('Limite de saldo negativo atingido! Máximo permitido: -R$ 12,00')
     return
   }
   

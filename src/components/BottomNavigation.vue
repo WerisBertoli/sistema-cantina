@@ -1,66 +1,73 @@
 <template>
-  <div class="menu">
-    <a
-      href="#"
-      @click.prevent="$emit('navigate', 'students')"
-      class="link"
-      :class="{ active: activeTab === 'students' }"
-    >
-      <span class="link-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+  <div class="fixed z-50 w-full h-16 max-w-lg -translate-x-1/2 bg-white border border-gray-200 rounded-full bottom-4 left-1/2 dark:bg-gray-700 dark:border-gray-600">
+    <div class="grid h-full max-w-lg grid-cols-5 mx-auto">
+      <!-- Ganhos -->
+      <button 
+        @click="$emit('navigate', 'earnings')"
+        :class="{ 'text-blue-600 dark:text-blue-500': activeTab === 'earnings' }"
+        class="inline-flex flex-col items-center justify-center px-5 rounded-s-full hover:bg-gray-50 dark:hover:bg-gray-800 group"
+      >
+        <svg class="w-5 h-5 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" :class="{ 'text-blue-600 dark:text-blue-500': activeTab === 'earnings' }" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M11.074 4 8.442.408A.95.95 0 0 0 7.014.254L2.926 4h8.148ZM9 13v-1a4 4 0 0 1 4-4h6V6a1 1 0 0 0-1-1H1a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1v-2h-6a4 4 0 0 1-4-4Z"/>
+          <path d="M19 10h-6a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1Zm-4.5 3.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2ZM12.62 4h2.78L12.539.41a1.086 1.086 0 1 0-1.7 1.352L12.62 4Z"/>
         </svg>
-      </span>
-      <span class="link-title">Home</span>
-    </a>
+        <span class="sr-only">Ganhos</span>
+      </button>
 
-    <a
-      href="#"
-      @click.prevent="$emit('navigate', 'earnings')"
-      class="link"
-      :class="{ active: activeTab === 'earnings' }"
-    >
-      <span class="link-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-        </svg>
-      </span>
-      <span class="link-title">Ganhos</span>
-    </a>
+      <!-- Produtos -->
+       <button 
+         @click="$emit('navigate', 'products')"
+         :class="{ 'text-blue-600 dark:text-blue-500': activeTab === 'products' }"
+         class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+       >
+         <svg class="w-5 h-5 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" :class="{ 'text-blue-600 dark:text-blue-500': activeTab === 'products' }" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 21">
+           <path d="M15 12a1 1 0 0 0 .962-.726l2-7A1 1 0 0 0 17 3H3.77L3.175.745A1 1 0 0 0 2.208 0H1a1 1 0 0 0 0 2h.438l.6 2.255v.019l2 7 .746 2.986A3 3 0 1 0 9 17a2.966 2.966 0 0 0-.184-1h2.368c-.118.32-.18.659-.184 1a3 3 0 1 0 3-3H6.78l-.5-2H15Z"/>
+         </svg>
+         <span class="sr-only">Produtos</span>
+       </button>
 
-    <a
-      href="#"
-      @click.prevent="$emit('navigate', 'products')"
-      class="link"
-      :class="{ active: activeTab === 'products' }"
-    >
-      <span class="link-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-        </svg>
-      </span>
-      <span class="link-title">Produtos</span>
-    </a>
+      <!-- Home (Centro) -->
+      <div class="flex items-center justify-center">
+        <button 
+          @click="$emit('navigate', 'students')"
+          :class="{ 'bg-blue-700': activeTab === 'students' }"
+          class="inline-flex items-center justify-center w-10 h-10 font-medium bg-blue-600 rounded-full hover:bg-blue-700 group focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800"
+        >
+          <svg class="w-4 h-4 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
+          </svg>
+          <span class="sr-only">Home</span>
+        </button>
+      </div>
 
-    <a
-      href="#"
-      @click.prevent="$emit('navigate', 'tarefas')"
-      class="link"
-      :class="{ active: activeTab === 'tarefas' }"
-    >
-      <span class="link-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3-6h.008v.008H15.75V12Zm0 3h.008v.008H15.75V15Zm0 3h.008v.008H15.75V18ZM6.75 6h10.5a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 17.25v-9A2.25 2.25 0 0 1 6.75 6Z" />
+      <!-- Tarefas -->
+       <button 
+         @click="$emit('navigate', 'tarefas')"
+         :class="{ 'text-blue-600 dark:text-blue-500': activeTab === 'tarefas' }"
+         class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+       >
+         <svg class="w-5 h-5 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" :class="{ 'text-blue-600 dark:text-blue-500': activeTab === 'tarefas' }" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
+            <path d="M16 0H4a2 2 0 0 0-2 2v1H1a1 1 0 0 0 0 2h1v2H1a1 1 0 0 0 0 2h1v2H1a1 1 0 0 0 0 2h1v2H1a1 1 0 0 0 0 2h1v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4.5a3 3 0 1 1 0 6 3 3 0 0 1 0-6ZM13.929 17H7.071a.5.5 0 0 1-.5-.5 3.935 3.935 0 1 1 7.858 0 .5.5 0 0 1-.5.5Z"/>
+          </svg>
+         <span class="sr-only">Tarefas</span>
+       </button>
+
+      <!-- Pedidos -->
+      <button 
+        @click="$emit('navigate', 'orders')"
+        :class="{ 'text-blue-600 dark:text-blue-500': activeTab === 'orders' }"
+        class="inline-flex flex-col items-center justify-center px-5 rounded-e-full hover:bg-gray-50 dark:hover:bg-gray-800 group"
+      >
+        <svg class="w-5 h-5 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" :class="{ 'text-blue-600 dark:text-blue-500': activeTab === 'orders' }" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+          <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z"/>
         </svg>
-      </span>
-      <span class="link-title">Tarefas</span>
-    </a>
+        <span class="sr-only">Pedidos</span>
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-
 interface Props {
   activeTab: string
 }
@@ -69,138 +76,22 @@ defineProps<Props>()
 defineEmits<{
   navigate: [tab: string]
 }>()
-
-const isDarkMode = ref(false)
-
-const toggleDarkMode = () => {
-  isDarkMode.value = !isDarkMode.value
-  const htmlElement = document.documentElement
-  
-  if (isDarkMode.value) {
-    htmlElement.classList.add('dark')
-    localStorage.setItem('theme', 'dark')
-  } else {
-    htmlElement.classList.remove('dark')
-    localStorage.setItem('theme', 'light')
-  }
-}
 </script>
 
 <style scoped>
-.menu {
-  @apply fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 8px 4px;
-  z-index: 1000;
-}
-
-@media (min-width: 640px) {
-  .menu {
-    padding: 12px 8px;
-  }
-}
-
-.link {
-  @apply flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 transition-all duration-300 ease-in-out;
-  text-decoration: none;
-  padding: 6px 8px;
-  border-radius: 8px;
-  min-width: 50px;
-  position: relative;
-}
-
-@media (min-width: 640px) {
-  .link {
-    padding: 8px 12px;
-    border-radius: 12px;
-    min-width: 60px;
-  }
-}
-
-.link:hover {
-  @apply text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-gray-700;
-  transform: translateY(-2px);
-}
-
-.link.active {
-  @apply text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-gray-700;
-}
-
-.link.active::before {
-  content: '';
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  @apply bg-blue-600 dark:bg-blue-400;
-  border-radius: 50%;
-}
-
-.link-icon {
-  @apply mb-1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-}
-
-.link-icon svg {
-  width: 100%;
-  height: 100%;
-  transition: transform 0.3s ease;
-}
-
-.link:hover .link-icon svg {
-  transform: scale(1.1);
-}
-
-.link-title {
-  @apply text-xs font-medium;
-  white-space: nowrap;
-  transition: all 0.3s ease;
-  font-size: 10px;
-}
-
-@media (min-width: 640px) {
-  .link-title {
-    font-size: 12px;
-  }
-}
-
-.link.active .link-title {
-  @apply font-semibold;
-}
-
 /* Animação de entrada */
-.menu {
+.fixed {
   animation: slideUp 0.3s ease-out;
 }
 
 @keyframes slideUp {
   from {
-    transform: translateY(100%);
+    transform: translateX(-50%) translateY(100%);
     opacity: 0;
   }
   to {
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
     opacity: 1;
-  }
-}
-
-/* Responsividade */
-@media (max-width: 640px) {
-  .link {
-    padding: 6px 8px;
-    min-width: 50px;
-  }
-
-  .link-title {
-    @apply text-xs;
   }
 }
 </style>

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Student, Product, Transaction, CartItem, Earnings, ModalState } from '@/types'
+import type { Student, Product, Transaction, CartItem, Earnings, ModalState, PrepaidOrder } from '@/types'
 import { BalanceStatus } from '@/types'
 import {
   collection,
@@ -11,8 +11,10 @@ import {
   query,
   orderBy,
   Timestamp,
+  writeBatch,
+  deleteDoc
 } from 'firebase/firestore'
-import { db } from '@/firebase'
+import { db, auth } from '@/firebase'
 
 export const useAppStore = defineStore('app', () => {
   // Estado reativo
@@ -26,6 +28,7 @@ export const useAppStore = defineStore('app', () => {
   const activeTab = ref('students')
   const modal = ref<ModalState>({ isOpen: false, type: null })
   const cart = ref<CartItem[]>([])
+  const prepaidOrders = ref<PrepaidOrder[]>([])
 
   // Computed
   const filteredStudents = computed(() => {
@@ -65,7 +68,7 @@ export const useAppStore = defineStore('app', () => {
 
   // Funções utilitárias
   const getBalanceStatus = (balance: number): BalanceStatus => {
-    if (balance <= 0) return BalanceStatus.CRITICAL
+    if (balance < 0) return BalanceStatus.CRITICAL
     if (balance <= 15) return BalanceStatus.LOW
     return BalanceStatus.NORMAL
   }
@@ -83,7 +86,22 @@ export const useAppStore = defineStore('app', () => {
       isLoading.value = true
       console.log('🔄 Iniciando aplicação...')
 
-      // Verificar se já existe um usuário autenticado
+      // Tentar fazer login anônimo se não há usuário autenticado
+      if (!auth.currentUser) {
+        try {
+          console.log('🔐 Tentando login anônimo...')
+          const { signInAnonymous } = await import('@/firebase')
+          await signInAnonymous()
+          console.log('✅ Login anônimo realizado com sucesso')
+        } catch (error: any) {
+          console.warn('⚠️ Login anônimo falhou:', error.code)
+          if (error.code === 'auth/admin-restricted-operation') {
+            console.warn('⚠️ Login anônimo está desabilitado no Firebase Console')
+            console.warn('⚠️ Algumas funcionalidades podem não funcionar corretamente')
+          }
+        }
+      }
+      
       console.log('🔄 Inicializando aplicação...')
       isAuthenticated.value = true
 
@@ -189,6 +207,19 @@ export const useAppStore = defineStore('app', () => {
             ...doc.data(),
           }) as Transaction,
       )
+    })
+
+    // Carregar pedidos pré-pagos
+    const prepaidOrdersQuery = query(collection(db, 'prepaidTransactions'), orderBy('createdAt', 'desc'))
+    onSnapshot(prepaidOrdersQuery, (snapshot) => {
+      prepaidOrders.value = snapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as PrepaidOrder,
+      )
+      console.log(`Carregados ${prepaidOrders.value.length} pedidos pré-pagos da coleção 'prepaidTransactions'`)
     })
   }
 
@@ -350,11 +381,12 @@ export const useAppStore = defineStore('app', () => {
       if (!student) throw new Error('Aluno não encontrado')
 
       const total = cartTotal.value
-      if (student.balance < total) {
-        throw new Error('Saldo insuficiente')
-      }
-
       const newBalance = student.balance - total
+      
+      // Verificar se excede o limite de saldo negativo
+      if (newBalance < -12.00) {
+        throw new Error('Limite de saldo negativo atingido! Máximo permitido: -R$ 12,00')
+      }
 
       // Atualizar saldo do aluno (usando campo 'saldo' do Firebase)
       await updateDoc(doc(db, 'alunos', studentId), {
@@ -379,6 +411,14 @@ export const useAppStore = defineStore('app', () => {
         date: Timestamp.now(),
         items,
       })
+
+      // Verificar se o saldo ficou negativo e gerar mensagem para os pais
+      if (newBalance < 0) {
+        const message = generateNegativeBalanceMessage(student)
+        console.log('Mensagem para os pais:', message)
+        // Aqui você pode implementar o envio da mensagem (WhatsApp, email, etc.)
+        // Por exemplo: await sendNotificationToParents(student, message)
+      }
 
       clearCart()
       closeModal()
@@ -452,6 +492,20 @@ export const useAppStore = defineStore('app', () => {
     )
   }
 
+  const generateNegativeBalanceMessage = (student: Student): string => {
+    const parentName = student.parentName || 'responsável'
+    return (
+      `🚨 ATENÇÃO - Saldo Negativo 🚨\n\n` +
+      `Prezado(a) ${parentName}, \n\n` +
+      `Informamos que ${student.name} está com saldo negativo na cantina.\n\n` +
+      `💰 Saldo atual: ${formatCurrency(student.balance)}\n\n` +
+      `⚠️ IMPORTANTE: Até que seja feito um depósito, não será mais liberado o lanche.\n\n` +
+      `Por favor, realize uma recarga o quanto antes para normalizar a situação.\n\n` +
+      `Atenciosamente,\n` +
+      `Cantina Digital 🏫`
+    )
+  }
+
   const generateWeeklyReport = async (student: Student): Promise<string> => {
     const oneWeekAgo = new Date()
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
@@ -487,6 +541,109 @@ export const useAppStore = defineStore('app', () => {
     return message
   }
 
+  // Funções para pedidos pré-pagos
+  const addPrepaidOrder = async (order: Omit<PrepaidOrder, 'id' | 'createdAt'>) => {
+    try {
+      const orderData = {
+        ...order,
+        createdAt: Timestamp.now()
+      }
+      
+      const docRef = await addDoc(collection(db, 'prepaidTransactions'), orderData)
+      const newOrder: PrepaidOrder = {
+        id: docRef.id,
+        ...orderData
+      }
+      
+      prepaidOrders.value.push(newOrder)
+      console.log('Pedido pré-pago adicionado:', newOrder)
+    } catch (error) {
+      console.error('Erro ao adicionar pedido pré-pago:', error)
+      throw error
+    }
+  }
+
+  const markOrderAsPickedUp = async (orderId: string) => {
+    try {
+      const orderRef = doc(db, 'prepaidTransactions', orderId)
+      const updateData = {
+        status: 'picked_up' as const,
+        pickedUpAt: Timestamp.now()
+      }
+      
+      await updateDoc(orderRef, updateData)
+      
+      const orderIndex = prepaidOrders.value.findIndex(order => order.id === orderId)
+      if (orderIndex !== -1) {
+        prepaidOrders.value[orderIndex] = {
+          ...prepaidOrders.value[orderIndex],
+          ...updateData
+        }
+      }
+      
+      console.log('Pedido marcado como retirado:', orderId)
+    } catch (error) {
+      console.error('Erro ao marcar pedido como retirado:', error)
+      throw error
+    }
+  }
+
+  const getPendingOrdersByStudent = (studentId: string) => {
+    return prepaidOrders.value.filter(order => 
+      order.studentId === studentId && order.status === 'pending'
+    )
+  }
+
+  const getAllOrdersByStudent = (studentId: string) => {
+    return prepaidOrders.value.filter(order => order.studentId === studentId)
+  }
+
+  const clearAllPrepaidOrders = async () => {
+    try {
+      // Limpar todos os pedidos do Firestore
+      const batch = writeBatch(db)
+      prepaidOrders.value.forEach(order => {
+        if (order.id) {
+          const orderRef = doc(db, 'prepaidTransactions', order.id)
+          batch.delete(orderRef)
+        }
+      })
+      
+      await batch.commit()
+      
+      // Limpar o array local
+      prepaidOrders.value = []
+      
+      console.log('Todos os pedidos pré-pagos foram removidos')
+    } catch (error) {
+      console.error('Erro ao limpar pedidos pré-pagos:', error)
+      throw error
+    }
+  }
+
+  const deletePrepaidOrder = async (orderId: string) => {
+    try {
+      if (!auth.currentUser) {
+        throw new Error('Usuário não autenticado. Não é possível deletar o pedido.')
+      }
+      
+      // Deletar do Firestore
+      const orderRef = doc(db, 'prepaidTransactions', orderId)
+      await deleteDoc(orderRef)
+      
+      // Remover do array local
+      const index = prepaidOrders.value.findIndex(order => order.id === orderId)
+      if (index !== -1) {
+        prepaidOrders.value.splice(index, 1)
+      }
+      
+      console.log('✅ Pedido deletado com sucesso')
+    } catch (error) {
+      console.error('❌ Erro ao deletar pedido:', error)
+      throw error
+    }
+  }
+
   return {
     // Estado
     isLoading,
@@ -499,6 +656,7 @@ export const useAppStore = defineStore('app', () => {
     activeTab,
     modal,
     cart,
+    prepaidOrders,
 
     // Computed
     filteredStudents,
@@ -525,6 +683,13 @@ export const useAppStore = defineStore('app', () => {
     closeModal,
     setSearchQuery,
     generateLowBalanceMessage,
+    generateNegativeBalanceMessage,
     generateWeeklyReport,
+    addPrepaidOrder,
+    markOrderAsPickedUp,
+    clearAllPrepaidOrders,
+    deletePrepaidOrder,
+    getPendingOrdersByStudent,
+    getAllOrdersByStudent,
   }
 })

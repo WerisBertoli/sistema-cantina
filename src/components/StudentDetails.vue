@@ -110,7 +110,25 @@
             <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
         </div>
-        <span class="action-label dark:text-white">Configurar Alerta</span>
+        <span class="action-label dark:text-white">Mensagem saldo baixo</span>
+      </button>
+
+      <button class="action-card message-action" @click="openNegativeBalanceMessage">
+        <div class="action-icon message-icon">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            <line x1="8" y1="9" x2="16" y2="9" />
+            <line x1="8" y1="13" x2="14" y2="13" />
+          </svg>
+        </div>
+        <span class="action-label dark:text-white">Mensagem saldo negativo</span>
       </button>
     </div>
   </div>
@@ -131,6 +149,7 @@ const getBalanceStatusClass = (): string => {
 
 const getBalanceStatus = (): string => {
   const balance = store.currentStudent?.balance || 0
+  if (balance < 0) return 'Negativo'
   if (balance >= 15) return 'Adequado'
   if (balance >= 12) return 'Baixo'
   return 'Crítico'
@@ -146,6 +165,10 @@ const openEditStudent = () => {
 
 const openLowBalanceAlert = () => {
   store.openModal('message', { type: 'lowBalance' })
+}
+
+const openNegativeBalanceMessage = () => {
+  store.openModal('message', { type: 'negativeBalance' })
 }
 </script>
 
@@ -353,7 +376,7 @@ const openLowBalanceAlert = () => {
 }
 
 .consumption-icon {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
   color: white;
 }
 
@@ -368,6 +391,11 @@ const openLowBalanceAlert = () => {
 }
 
 .alert-icon {
+  background: linear-gradient(135deg, #fb923c, #ea580c);
+  color: white;
+}
+
+.message-icon {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
 }

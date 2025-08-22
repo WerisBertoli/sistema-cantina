@@ -59,6 +59,9 @@ const modalTitle = computed(() => {
   if (modalData?.type === 'lowBalance') {
     return 'Alerta de Saldo Baixo'
   }
+  if (modalData?.type === 'negativeBalance') {
+    return 'Alerta de Saldo Negativo'
+  }
   if (modalData?.type === 'weeklyReport') {
     return 'Resumo Semanal'
   }
@@ -104,6 +107,8 @@ onMounted(async () => {
   
   if (modalData?.type === 'lowBalance' && store.currentStudent) {
     message.value = store.generateLowBalanceMessage(store.currentStudent)
+  } else if (modalData?.type === 'negativeBalance' && store.currentStudent) {
+    message.value = store.generateNegativeBalanceMessage(store.currentStudent)
   } else if (modalData?.type === 'weeklyReport' && store.currentStudent) {
     message.value = await store.generateWeeklyReport(store.currentStudent)
   }

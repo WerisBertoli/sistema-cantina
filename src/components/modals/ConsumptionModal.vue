@@ -331,10 +331,14 @@
         </div>
 
         <div
-          class="mt-2 p-2 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 dark:from-blue-600 dark:to-cyan-600 border border-white/10 dark:border-white/20 shadow-[0_8px_32px_rgba(59,130,246,0.25)] dark:shadow-[0_8px_32px_rgba(59,130,246,0.3)]"
+          class="mt-2 p-2 rounded-xl border border-white/10 dark:border-white/20 shadow-[0_8px_32px_rgba(59,130,246,0.25)] dark:shadow-[0_8px_32px_rgba(59,130,246,0.3)]"
+          :class="newBalance < 0 ? 'bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700' : 'bg-gradient-to-br from-blue-500 to-cyan-500 dark:from-blue-600 dark:to-cyan-600'"
         >
           <p class="text-sm text-white/90">Novo saldo:</p>
           <p class="font-medium text-white">{{ store.formatCurrency(newBalance) }}</p>
+          <p v-if="newBalance < 0 && newBalance >= -12.00" class="text-xs text-white/80 mt-1">
+            ⚠️ Saldo negativo - Os pais serão notificados
+          </p>
         </div>
       </div>
 
@@ -350,7 +354,7 @@
         </button>
         <button
           @click="handleSubmit"
-          :disabled="isSubmitting || store.cartTotal === 0 || newBalance < 0"
+          :disabled="isSubmitting || store.cartTotal === 0 || newBalance < -12.00"
           class="new-confirm-button w-full sm:w-auto order-1 sm:order-2"
         >
           {{ isSubmitting ? 'Processando...' : 'Confirmar Consumo' }}
@@ -434,8 +438,8 @@ const removeFromCart = (product: Product) => {
 const handleSubmit = async () => {
   if (isSubmitting.value || !currentStudent.value || store.cartTotal === 0) return
 
-  if (newBalance.value < 0) {
-    alert('Saldo insuficiente para esta compra!')
+  if (newBalance.value < -12.00) {
+    alert('Limite de saldo negativo atingido! Máximo permitido: -R$ 12,00')
     return
   }
 

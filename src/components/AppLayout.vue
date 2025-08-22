@@ -1,5 +1,5 @@
 <template>
-  <div 
+  <div
     class="flex flex-col h-screen"
     @touchstart="handleTouchStart"
     @touchmove="handleTouchMove"
@@ -14,22 +14,29 @@
           @click="store.setCurrentStudent(null)"
           class="modern-back-button flex items-center px-3 py-2 rounded-lg transition-all duration-300"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-4 h-4 mr-2"
+          >
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
           </svg>
           <span class="text-sm sm:text-base">Voltar</span>
         </button>
-        
+
         <!-- Logo da Escola (quando não há estudante selecionado) -->
         <div v-if="!store.currentStudent" class="flex items-center">
-          <img 
-            src="/logo-erlach.png" 
-            alt="Logo Centro Educacional Erlach" 
+          <img
+            src="/logo-erlach.png"
+            alt="Logo Centro Educacional Erlach"
             class="h-8 w-8 sm:h-10 sm:w-10 object-contain"
-            style="background: transparent; mix-blend-mode: multiply;"
+            style="background: transparent; mix-blend-mode: multiply"
           />
         </div>
-        
+
         <!-- Espaçador quando há estudante selecionado -->
         <div v-if="store.currentStudent" class="flex-1"></div>
 
@@ -42,13 +49,37 @@
             title="Alternar tema"
           >
             <!-- Ícone Sol (Modo Claro) -->
-            <svg v-if="isDarkMode" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-white">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+            <svg
+              v-if="isDarkMode"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 text-white"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+              />
             </svg>
-            
+
             <!-- Ícone Lua (Modo Escuro) -->
-            <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-white">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+            <svg
+              v-else
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 text-white"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
+              />
             </svg>
           </button>
 
@@ -58,18 +89,29 @@
             class="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
             title="Sair"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-white">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5 text-white"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
+              />
             </svg>
           </button>
         </div>
       </div>
-      
+
       <!-- Cantina Digital - Centralizado -->
-      <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-        <h1 class="text-lg sm:text-xl font-bold tracking-wider text-white">
-          Cantina Digital
-        </h1>
+      <div
+        class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
+      >
+        <h1 class="text-lg sm:text-xl font-bold tracking-wider text-white">Cantina Digital</h1>
       </div>
     </header>
 
@@ -89,12 +131,13 @@
 
       <!-- Todo List -->
       <TodoListView v-if="!store.currentStudent && store.activeTab === 'tarefas'" />
+
+      <!-- Prepaid Orders -->
+      <PrepaidOrdersView v-if="!store.currentStudent && store.activeTab === 'orders'" />
     </main>
 
     <!-- Bottom Navigation -->
     <BottomNavigation @navigate="store.setActiveTab" :activeTab="store.activeTab" />
-
-
   </div>
 </template>
 
@@ -109,6 +152,7 @@ import StudentDetails from '@/components/StudentDetails.vue'
 import EarningsView from '@/components/EarningsView.vue'
 import ProductManagement from '../components/ProductManagement.vue'
 import TodoListView from '@/components/TodoListView.vue'
+import PrepaidOrdersView from '@/components/PrepaidOrdersView.vue'
 import BottomNavigation from '@/components/BottomNavigation.vue'
 
 const store = useAppStore()
@@ -149,7 +193,7 @@ const handleTouchMove = (e: TouchEvent) => {
   // Prevent default scrolling behavior during swipe
   const deltaX = e.touches[0].clientX - touchStartX.value
   const deltaY = Math.abs(e.touches[0].clientY - touchStartY.value)
-  
+
   // If it's a horizontal swipe (more horizontal than vertical movement)
   if (Math.abs(deltaX) > deltaY && Math.abs(deltaX) > 20) {
     e.preventDefault()
@@ -159,10 +203,10 @@ const handleTouchMove = (e: TouchEvent) => {
 const handleTouchEnd = (e: TouchEvent) => {
   touchEndX.value = e.changedTouches[0].clientX
   touchEndY.value = e.changedTouches[0].clientY
-  
+
   const deltaX = touchEndX.value - touchStartX.value
   const deltaY = Math.abs(touchEndY.value - touchStartY.value)
-  
+
   // Check if it's a valid swipe gesture
   if (Math.abs(deltaX) > minSwipeDistance && deltaY < maxVerticalDistance) {
     // Swipe right (go back)
