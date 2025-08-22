@@ -12,56 +12,125 @@
       </div>
     </div>
 
+    <!-- Linha do tempo de datas -->
+       <div class="mb-6">
+         <div class="flex items-center justify-between mb-4">
+           <button
+             @click="goToToday"
+             class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+           >
+             Hoje
+           </button>
+           
+           <h3 class="text-lg font-semibold text-gray-800 dark:text-white text-center">
+             {{ selectedDate.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
+           </h3>
+           
+           <div class="w-12"></div> <!-- Spacer para centralizar o título -->
+         </div>
+         
+         <!-- Timeline de datas com swipe -->
+         <div 
+           class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide"
+           @touchstart="handleTouchStart"
+           @touchmove="handleTouchMove"
+           @touchend="handleTouchEnd"
+         >
+           <button
+             v-for="date in timelineDates"
+             :key="date.toISOString()"
+             @click="selectedDate = date"
+             :class="[
+               'flex-shrink-0 flex flex-col items-center p-3 rounded-lg transition-all duration-200 min-w-[80px]',
+               selectedDate.toDateString() === date.toDateString()
+                 ? 'bg-blue-600 text-white shadow-lg transform scale-105'
+                 : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+             ]"
+           >
+             <span class="text-xs font-medium uppercase">
+               {{ date.toLocaleDateString('pt-BR', { weekday: 'short' }) }}
+             </span>
+             <span class="text-lg font-bold mt-1">
+               {{ date.getDate() }}
+             </span>
+             <span class="text-xs mt-1">
+               {{ date.toLocaleDateString('pt-BR', { month: 'short' }) }}
+             </span>
+           </button>
+         </div>
+         
+         <!-- Indicador de swipe para mobile -->
+         <p class="text-xs text-gray-500 dark:text-gray-400 text-center mt-2 md:hidden">
+           Deslize para navegar entre as datas
+         </p>
+       </div>
+
     <div class="orders-list">
-      <div v-if="orders.length === 0" class="empty-state">
+      <div v-if="filteredOrders.length === 0" class="empty-state">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-gray-400">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
         </svg>
-        <p class="text-gray-500">Nenhum pedido encontrado</p>
+        <p class="text-gray-500">Não há pedidos pré-pagos para {{ selectedDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }) }}.</p>
       </div>
 
-      <div v-for="order in orders" :key="order.id" class="order-card" :class="{
-        'status-pending': order.status === 'pending',
-        'status-picked-up': order.status === 'picked_up'
-      }" @click="openOrderDetails(order)">
-        <div class="card-content">
-          <div class="student-info">
-            <h3 class="student-name">{{ order.studentName }}</h3>
-          </div>
-          
-          <div class="product-info">
-            <span class="product-summary">
-              {{ order.items.length === 1 ? 
-                `${order.items[0].quantity}x ${order.items[0].productName}` : 
-                `${order.items.length} produtos` 
-              }}
-            </span>
-          </div>
-          
-          <div class="status-and-actions">
-            <span class="status-badge" :class="order.status">
-              {{ order.status === 'pending' ? 'Pendente' : 'Retirado' }}
-            </span>
-            <div class="action-buttons">
-              <button 
-                v-if="order.status === 'pending'"
-                @click.stop="markAsPickedUp(order.id!)" 
-                class="pickup-button"
-                title="Marcar como retirado"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
-              </button>
-              <button 
-                @click.stop="deleteOrder(order.id!)" 
-                class="delete-button"
-                title="Deletar pedido"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                </svg>
-              </button>
+      <!-- Pedidos agrupados por dia -->
+      <div v-for="dayGroup in ordersByDay" :key="dayGroup.date" class="day-group">
+        <div class="day-header">
+          <h3 class="day-title">
+            <span v-if="isToday(dayGroup.date)" class="day-label today">Hoje</span>
+            <span v-else-if="isYesterday(dayGroup.date)" class="day-label yesterday">Ontem</span>
+            <span v-else class="day-label">{{ getDayOfWeek(dayGroup.date) }}</span>
+            <span class="day-date">{{ dayGroup.date }}</span>
+          </h3>
+          <span class="orders-count">{{ dayGroup.orders.length }} pedido{{ dayGroup.orders.length !== 1 ? 's' : '' }}</span>
+        </div>
+
+        <div class="day-orders">
+          <div v-for="order in dayGroup.orders" :key="order.id" class="order-card" :class="{
+            'status-pending': order.status === 'pending',
+            'status-picked-up': order.status === 'picked_up'
+          }" @click="openOrderDetails(order)">
+            <div class="card-content">
+              <div class="student-info">
+                <h3 class="student-name">{{ order.studentName }}</h3>
+                <span class="order-time">{{ formatTime(order.createdAt) }}</span>
+              </div>
+              
+              <div class="product-info">
+                <span class="product-summary">
+                  {{ order.items.length === 1 ? 
+                    `${order.items[0].quantity}x ${order.items[0].productName}` : 
+                    `${order.items.length} produtos` 
+                  }}
+                </span>
+              </div>
+              
+              <div class="status-and-actions">
+                <span class="status-badge" :class="order.status">
+                  {{ order.status === 'pending' ? 'Pendente' : 'Retirado' }}
+                </span>
+                <div class="action-buttons">
+                  <button 
+                    v-if="order.status === 'pending'"
+                    @click.stop="markAsPickedUp(order.id!)" 
+                    class="pickup-button"
+                    title="Marcar como retirado"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  </button>
+                  <button 
+                    @click.stop="deleteOrder(order.id!)" 
+                    class="delete-button"
+                    title="Deletar pedido"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -148,8 +217,84 @@ import { computed, ref } from 'vue'
 import { useAppStore } from '@/stores/app'
 import type { PrepaidOrder } from '@/types'
 import type { Timestamp } from 'firebase/firestore'
+import { useConfirm } from 'primevue/useconfirm'
 
 const store = useAppStore()
+const confirm = useConfirm()
+
+// Estado para controlar a data selecionada
+const selectedDate = ref(new Date())
+
+// Gerar array de datas para a linha do tempo (7 dias: 3 anteriores, data selecionada, 3 posteriores)
+const timelineDates = computed(() => {
+  const dates = []
+  const baseDate = new Date(selectedDate.value)
+  
+  for (let i = -3; i <= 3; i++) {
+    const date = new Date(baseDate)
+    date.setDate(baseDate.getDate() + i)
+    dates.push(date)
+  }
+  
+  return dates
+})
+
+// Funções de navegação
+const goToPreviousWeek = () => {
+  const newDate = new Date(selectedDate.value)
+  newDate.setDate(newDate.getDate() - 7)
+  selectedDate.value = newDate
+}
+
+const goToNextWeek = () => {
+  const newDate = new Date(selectedDate.value)
+  newDate.setDate(newDate.getDate() + 7)
+  selectedDate.value = newDate
+}
+
+const goToToday = () => {
+  selectedDate.value = new Date()
+}
+
+// Touch/Swipe functionality
+let touchStartX = 0
+let touchEndX = 0
+let isDragging = false
+let startTime = 0
+
+const handleTouchStart = (e: TouchEvent) => {
+    touchStartX = e.touches[0].clientX
+    startTime = Date.now()
+    isDragging = false
+  }
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (!isDragging && Math.abs(e.touches[0].clientX - touchStartX) > 10) {
+      isDragging = true
+    }
+    if (isDragging) {
+      e.preventDefault()
+    }
+  }
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    touchEndX = e.changedTouches[0].clientX
+    const swipeDistance = touchStartX - touchEndX
+    const swipeTime = Date.now() - startTime
+    
+    // Detecta swipe se a distância for maior que 50px e o tempo menor que 300ms
+    if (Math.abs(swipeDistance) > 50 && swipeTime < 300) {
+      if (swipeDistance > 0) {
+        // Swipe para esquerda - próxima semana
+        goToNextWeek()
+      } else {
+        // Swipe para direita - semana anterior
+        goToPreviousWeek()
+      }
+    }
+    
+    isDragging = false
+  }
 
 const prepaidOrders = computed(() => store.prepaidOrders)
 
@@ -161,6 +306,74 @@ const orders = computed(() => {
     return bTime - aTime
   })
 })
+
+// Filtrar pedidos baseado na data selecionada
+const filteredOrders = computed(() => {
+  const selectedDay = new Date(selectedDate.value.getFullYear(), selectedDate.value.getMonth(), selectedDate.value.getDate())
+  
+  return prepaidOrders.value.filter(order => {
+    const orderDate = order.createdAt instanceof Date 
+      ? order.createdAt 
+      : (order.createdAt as Timestamp).toDate()
+    
+    const orderDay = new Date(orderDate.getFullYear(), orderDate.getMonth(), orderDate.getDate())
+    
+    return orderDay.getTime() === selectedDay.getTime()
+  })
+})
+
+const ordersByDay = computed(() => {
+  const grouped: { [key: string]: PrepaidOrder[] } = {}
+  
+  filteredOrders.value.forEach(order => {
+    const date = order.createdAt.toDate()
+    const dateKey = date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
+    
+    if (!grouped[dateKey]) {
+      grouped[dateKey] = []
+    }
+    grouped[dateKey].push(order)
+  })
+  
+  // Converter para array e ordenar por data (mais recente primeiro)
+  return Object.entries(grouped)
+    .map(([date, orders]) => ({ date, orders }))
+    .sort((a, b) => {
+      const dateA = new Date(a.date.split('/').reverse().join('-'))
+      const dateB = new Date(b.date.split('/').reverse().join('-'))
+      return dateB.getTime() - dateA.getTime()
+    })
+})
+
+const getDayOfWeek = (dateString: string) => {
+  const date = new Date(dateString.split('/').reverse().join('-'))
+  const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
+  return days[date.getDay()]
+}
+
+const isToday = (dateString: string) => {
+  const today = new Date().toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+  return dateString === today
+}
+
+const isYesterday = (dateString: string) => {
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const yesterdayString = yesterday.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+  return dateString === yesterdayString
+}
 
 const openAddOrderModal = () => {
   store.openModal('addPrepaidOrder')
@@ -186,20 +399,42 @@ const formatDate = (timestamp: Timestamp) => {
   })
 }
 
+const formatTime = (timestamp: Timestamp) => {
+  const date = timestamp.toDate()
+  return date.toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
 const formatCurrency = (value: number) => {
   return store.formatCurrency(value)
 }
 
 const deleteOrder = async (orderId: string) => {
-  if (confirm('Tem certeza que deseja deletar este pedido? Esta ação não pode ser desfeita.')) {
-    try {
-      await store.deletePrepaidOrder(orderId)
-      closeOrderDetails()
-    } catch (error) {
-      console.error('❌ Erro ao deletar pedido:', error)
-      alert('Erro ao deletar pedido. Verifique se você está autenticado.')
+  confirm.require({
+    message: 'Tem certeza que deseja deletar este pedido? Esta ação não pode ser desfeita.',
+    header: 'Confirmar Exclusão',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancelar',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Deletar',
+      severity: 'danger'
+    },
+    accept: async () => {
+      try {
+        await store.deletePrepaidOrder(orderId)
+        closeOrderDetails()
+      } catch (error) {
+        console.error('❌ Erro ao deletar pedido:', error)
+        alert('Erro ao deletar pedido. Verifique se você está autenticado.')
+      }
     }
-  }
+  })
 }
 
 const selectedOrder = ref<PrepaidOrder | null>(null)
@@ -242,11 +477,47 @@ const closeOrderDetails = () => {
 }
 
 .orders-list {
-  @apply space-y-4;
+  @apply space-y-6;
 }
 
 .empty-state {
   @apply flex flex-col items-center justify-center py-12 text-center;
+}
+
+.day-group {
+  @apply space-y-3;
+}
+
+.day-header {
+  @apply flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700;
+}
+
+.day-title {
+  @apply flex items-center gap-2 text-lg font-semibold text-gray-800 dark:text-white;
+}
+
+.day-label {
+  @apply text-gray-800 dark:text-white;
+}
+
+.day-label.today {
+  @apply text-blue-600 dark:text-blue-400 font-bold;
+}
+
+.day-label.yesterday {
+  @apply text-orange-600 dark:text-orange-400 font-medium;
+}
+
+.day-date {
+  @apply text-sm text-gray-500 dark:text-gray-400 font-normal;
+}
+
+.orders-count {
+  @apply text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full;
+}
+
+.day-orders {
+  @apply space-y-3 ml-4;
 }
 
 .order-card {
@@ -271,6 +542,10 @@ const closeOrderDetails = () => {
 
 .student-name {
   @apply text-lg font-semibold text-gray-800 dark:text-white;
+}
+
+.order-time {
+  @apply text-xs text-gray-500 dark:text-gray-400 mt-1;
 }
 
 .product-info {
@@ -307,6 +582,22 @@ const closeOrderDetails = () => {
 
 .delete-button {
   @apply p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors;
+}
+
+/* Esconder scrollbar para melhor experiência de swipe */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Melhorar a experiência de touch */
+.scrollbar-hide {
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Modal Styles */

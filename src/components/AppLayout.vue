@@ -45,7 +45,7 @@
           <!-- Toggle Dark Mode -->
           <button
             @click="toggleDarkMode"
-            class="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+            class="modern-toggle-button p-2 rounded-lg transition-colors"
             title="Alternar tema"
           >
             <!-- Ícone Sol (Modo Claro) -->
@@ -86,7 +86,7 @@
           <!-- Botão Logout -->
           <button
             @click="handleLogout"
-            class="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+            class="modern-toggle-button p-2 rounded-lg transition-colors"
             title="Sair"
           >
             <svg
@@ -138,6 +138,9 @@
 
     <!-- Bottom Navigation -->
     <BottomNavigation @navigate="store.setActiveTab" :activeTab="store.activeTab" />
+    
+    <!-- Confirm Dialog -->
+    <ConfirmDialog></ConfirmDialog>
   </div>
 </template>
 
@@ -154,6 +157,7 @@ import ProductManagement from '../components/ProductManagement.vue'
 import TodoListView from '@/components/TodoListView.vue'
 import PrepaidOrdersView from '@/components/PrepaidOrdersView.vue'
 import BottomNavigation from '@/components/BottomNavigation.vue'
+import ConfirmDialog from 'primevue/confirmdialog'
 
 const store = useAppStore()
 const router = useRouter()
@@ -257,9 +261,62 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Header com cor sólida igual ao th */
+/* Header com gradiente moderno e animado */
 .modern-header {
-  background: #2563eb;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #2563eb 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.15),
+    0 8px 40px rgba(102, 126, 234, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modern-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+}
+
+.modern-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: shimmer 3s infinite;
+  pointer-events: none;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 /* Container do nome da escola */
@@ -273,35 +330,133 @@ onMounted(() => {
   color: #ff2800 !important;
 }
 
-/* Botão de toggle sem efeitos */
-.modern-toggle-button {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-}
-
-/* Botão de voltar sem efeitos */
+/* Botões modernos com animações */
+.modern-toggle-button,
 .modern-back-button {
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
-/* Responsividade */
+.modern-toggle-button::before,
+.modern-back-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.modern-toggle-button:hover,
+.modern-back-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modern-toggle-button:hover::before,
+.modern-back-button:hover::before {
+  left: 100%;
+}
+
+.modern-toggle-button:active,
+.modern-back-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Animação para ícones dos botões */
+.modern-toggle-button svg,
+.modern-back-button svg {
+  transition: transform 0.3s ease;
+}
+
+.modern-toggle-button:hover svg,
+.modern-back-button:hover svg {
+  transform: scale(1.1);
+}
+
+/* Título com animação suave */
+.school-title {
+  color: white !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  animation: titleGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  from {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 255, 255, 0.1);
+  }
+  to {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Logo da escola com animação */
+.modern-header img {
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.modern-header img:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* Responsividade aprimorada */
 @media (max-width: 640px) {
   .modern-header {
     padding: 0.75rem 0.75rem 1rem 0.75rem;
+    box-shadow: 
+      0 2px 15px rgba(0, 0, 0, 0.1),
+      0 4px 30px rgba(102, 126, 234, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   .school-title {
     font-size: 1.125rem;
   }
+
+  .modern-toggle-button,
+  .modern-back-button {
+    padding: 0.5rem;
+  }
+
+  .modern-toggle-button svg,
+  .modern-back-button svg {
+    width: 1rem;
+    height: 1rem;
+  }
 }
 
-/* Modo escuro - ajustes para manter a consistência */
+@media (min-width: 641px) {
+  .modern-header {
+    box-shadow: 
+      0 6px 25px rgba(0, 0, 0, 0.15),
+      0 10px 50px rgba(102, 126, 234, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Modo escuro - ajustes modernos */
 .dark .modern-header {
-  background: #1d4ed8;
-  border-bottom-color: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #1d4ed8 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 8px 40px rgba(30, 58, 138, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-bottom-color: rgba(255, 255, 255, 0.05);
 }
 
 .dark .modern-header::before {
@@ -317,5 +472,15 @@ onMounted(() => {
 .dark .modern-toggle-button:hover,
 .dark .modern-back-button:hover {
   background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 640px) {
+  .dark .modern-header {
+    box-shadow: 
+      0 2px 15px rgba(0, 0, 0, 0.2),
+      0 4px 30px rgba(30, 58, 138, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="p-4 space-y-6">
     <!-- Período Selecionado -->
-    <div class="bg-blue-600 dark:bg-blue-700 rounded-lg shadow-sm p-4">
+    <div class="bg-blue-600 dark:bg-blue-700 p-4">
       <h2 class="text-lg font-semibold text-white mb-3">Período</h2>
       <div class="flex space-x-2">
         <button
@@ -24,7 +24,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <!-- Ganho do Período -->
       <div
-        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700"
+        class="bg-white dark:bg-gray-800 p-6 border border-gray-100 dark:border-gray-700"
       >
         <div class="flex items-start justify-between">
           <div>
@@ -55,7 +55,7 @@
 
       <!-- Total de Transações -->
       <div
-        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700"
+        class="bg-white dark:bg-gray-800 p-6 border border-gray-100 dark:border-gray-700"
       >
         <div class="flex items-start justify-between">
           <div>
@@ -85,7 +85,7 @@
 
     <!-- Histórico de Transações -->
     <div
-      class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700"
+      class="bg-white dark:bg-gray-800 p-6 border border-gray-100 dark:border-gray-700"
     >
       <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
         <svg
@@ -115,29 +115,42 @@
                 <h3 class="font-medium text-gray-900 dark:text-white text-sm">
                   {{ getStudentName(transaction.studentId) }}
                 </h3>
-                <span :class="[
-                  'text-sm font-medium',
-                  transaction.type === 'credit' ? 'text-blue-600 dark:text-blue-400' : 'text-green-600 dark:text-green-400'
-                ]">
-                  {{ transaction.type === 'credit' ? '+' : '' }}{{ formatCurrency(transaction.value) }}
+                <span
+                  :class="[
+                    'text-sm font-medium',
+                    transaction.type === 'credit'
+                      ? 'text-blue-600 dark:text-blue-400'
+                      : 'text-green-600 dark:text-green-400',
+                  ]"
+                >
+                  {{ transaction.type === 'credit' ? '+' : ''
+                  }}{{ formatCurrency(transaction.value) }}
                 </span>
               </div>
-              
-              <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+
+              <div
+                class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400"
+              >
                 <span>{{ formatDate(transaction.date) }}</span>
-                <span :class="[
-                  'px-2 py-1 rounded text-xs',
-                  transaction.type === 'credit' 
-                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
-                    : 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                ]">
+                <span
+                  :class="[
+                    'px-2 py-1 rounded text-xs',
+                    transaction.type === 'credit'
+                      ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                      : 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+                  ]"
+                >
                   {{ transaction.type === 'credit' ? 'Recarga' : 'Consumo' }}
                 </span>
               </div>
-              
-              <div v-if="transaction.items && transaction.items.length > 0" class="mt-2 text-xs text-gray-600 dark:text-gray-400">
+
+              <div
+                v-if="transaction.items && transaction.items.length > 0"
+                class="mt-2 text-xs text-gray-600 dark:text-gray-400"
+              >
                 <span v-for="(item, index) in transaction.items" :key="item.productName">
-                  {{ item.quantity }}x {{ item.productName }}<span v-if="index < transaction.items.length - 1">, </span>
+                  {{ item.quantity }}x {{ item.productName
+                  }}<span v-if="index < transaction.items.length - 1">, </span>
                 </span>
               </div>
             </div>

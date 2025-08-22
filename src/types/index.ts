@@ -67,7 +67,7 @@ export interface PrepaidOrder {
 export enum BalanceStatus {
   NORMAL = 'normal',
   LOW = 'low',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 // Interface para navegação
@@ -83,6 +83,15 @@ export type NavigationTabType = 'students' | 'earnings' | 'products' | 'todo' | 
 // Interface para modal
 export interface ModalState {
   isOpen: boolean
-  type: 'addStudent' | 'addCredit' | 'consumption' | 'quickConsumption' | 'message' | 'weeklyHistory' | 'editStudent' | 'addPrepaidOrder' | null
+  type:
+    | 'addStudent'
+    | 'addCredit'
+    | 'consumption'
+    | 'quickConsumption'
+    | 'message'
+    | 'weeklyHistory'
+    | 'editStudent'
+    | 'addPrepaidOrder'
+    | null
   data?: Student | TransactionItem[] | { student: Student } | { type: string } | PrepaidOrder | any
 }

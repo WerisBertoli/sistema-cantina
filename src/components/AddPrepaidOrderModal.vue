@@ -23,6 +23,17 @@
           />
         </div>
 
+        <!-- Data do Pedido -->
+        <div class="form-group">
+          <label class="form-label">Data do Pedido</label>
+          <input 
+            type="date"
+            v-model="orderDate"
+            class="form-input"
+            required
+          />
+        </div>
+
         <!-- Lista de Produtos por Categoria -->
         <div class="form-group">
           <label class="form-label">Produtos</label>
@@ -218,6 +229,7 @@ import { Timestamp } from 'firebase/firestore'
 const store = useAppStore()
 
 const studentName = ref('')
+const orderDate = ref(new Date().toISOString().split('T')[0]) // Data atual no formato YYYY-MM-DD
 
 const orderItems = ref<Map<string, TransactionItem>>(new Map())
 
@@ -294,7 +306,7 @@ const decreaseQuantity = (productId: string) => {
 
 const resetForm = () => {
   studentName.value = ''
-
+  orderDate.value = new Date().toISOString().split('T')[0] // Reset para data atual
   orderItems.value.clear()
 }
 
@@ -310,13 +322,21 @@ const submitOrder = async () => {
   const studentId = `manual_${Date.now()}`
   const studentNameValue = studentName.value.trim()
 
+  // Converte a data selecionada para Timestamp do Firebase
+  // Cria a data no fuso horário local para evitar problemas de UTC
+  const [year, month, day] = orderDate.value.split('-').map(Number)
+  const selectedDate = new Date(year, month - 1, day) // month é 0-indexed
+  // Mantém a hora atual para a data selecionada
+  const now = new Date()
+  selectedDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds())
+
   const order: Omit<PrepaidOrder, 'id'> = {
     studentId,
     studentName: studentNameValue,
     items: Array.from(orderItems.value.values()),
     totalValue: totalValue.value,
     status: 'pending',
-    createdAt: Timestamp.now(),
+    createdAt: Timestamp.fromDate(selectedDate),
     
   }
 

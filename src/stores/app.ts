@@ -311,6 +311,23 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  const deleteProduct = async (productId: string) => {
+    try {
+      if (!auth.currentUser) {
+        throw new Error('Usuário não autenticado. Não é possível deletar o produto.')
+      }
+      
+      // Deletar do Firestore
+      const productRef = doc(db, 'produtos', productId)
+      await deleteDoc(productRef)
+      
+      console.log('✅ Produto deletado com sucesso')
+    } catch (error) {
+      console.error('❌ Erro ao deletar produto:', error)
+      throw error
+    }
+  }
+
   const addCredit = async (studentId: string, amount: number) => {
     try {
       const student = students.value.find((s) => s.id === studentId)
@@ -542,14 +559,9 @@ export const useAppStore = defineStore('app', () => {
   }
 
   // Funções para pedidos pré-pagos
-  const addPrepaidOrder = async (order: Omit<PrepaidOrder, 'id' | 'createdAt'>) => {
+  const addPrepaidOrder = async (order: Omit<PrepaidOrder, 'id'>) => {
     try {
-      const orderData = {
-        ...order,
-        createdAt: Timestamp.now()
-      }
-      
-      const docRef = await addDoc(collection(db, 'prepaidTransactions'), orderData)
+      const docRef = await addDoc(collection(db, 'prepaidTransactions'), order)
       console.log('Pedido pré-pago adicionado com ID:', docRef.id)
       // O onSnapshot listener irá automaticamente atualizar o array prepaidOrders
     } catch (error) {
@@ -666,6 +678,7 @@ export const useAppStore = defineStore('app', () => {
     updateStudent,
     addProduct,
     updateProduct,
+    deleteProduct,
     addCredit,
     editCreditTransaction,
     processConsumption,

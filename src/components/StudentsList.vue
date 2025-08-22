@@ -1,64 +1,63 @@
 <template>
-  <div class="bg-white dark:bg-gray-900 pb-6 sm:pb-8" style="overflow-x: hidden !important; max-width: 100vw; width: 100%;">
-    <div class="px-3 pt-3 pb-2 sm:px-4 sm:pt-4 bg-white dark:bg-gray-900">
-      <h2 class="modern-title text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-blue-600 dark:text-blue-400 text-center">
-        Lista de Alunos
-      </h2>
-      
-      <div class="mb-4 sm:mb-6 flex justify-center">
-        <div class="search-container relative w-full max-w-md">
-          <input
-            v-model="searchTerm"
-            type="text"
-            class="search-input modern-search-input w-full px-4 py-2 sm:py-3 text-sm sm:text-base"
-            placeholder="Buscar aluno..."
-          />
-          <button
-            @click="store.openModal('addStudent')"
-            class="add-student-button w-12 h-12 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center flex-shrink-0"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
+  <div
+    class="bg-white dark:bg-gray-900 pb-6 sm:pb-8"
+    style="overflow-x: hidden !important; max-width: 100vw; width: 100%"
+  >
 
-    <div v-if="filteredStudents.length === 0" class="text-center py-6 px-3 sm:py-8 sm:px-4 bg-white dark:bg-gray-900">
+
+    <div
+      v-if="filteredStudents.length === 0"
+      class="text-center py-6 px-3 sm:py-8 sm:px-4 bg-white dark:bg-gray-900"
+    >
       <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300">Nenhum aluno encontrado</p>
     </div>
 
     <!-- Layout para Mobile (Cards) -->
-    <div class="block sm:hidden px-3 space-y-4">
-      <div 
-        v-for="(student, index) in filteredStudents" 
+    <div class="block sm:hidden px-3 space-y-3">
+      <div
+        v-for="(student, index) in filteredStudents"
         :key="student.id"
-        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-5 cursor-pointer transition-all duration-200 hover:shadow-xl hover:scale-[1.02]"
+        class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 cursor-pointer transition-all duration-200 hover:shadow-lg"
         @click="selectStudent(student)"
       >
         <div class="flex items-center justify-between">
-          <div class="flex-1 min-w-0">
-            <div class="mb-2">
-              <h3 class="font-semibold text-lg text-gray-900 dark:text-white truncate">{{ student.name }}</h3>
+          <div class="flex items-center flex-1 min-w-0">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+              {{ student.name.charAt(0).toUpperCase() }}
             </div>
-            <p v-if="student.parentName" class="text-base text-gray-600 dark:text-gray-300 truncate">{{ student.parentName }}</p>
+            <div class="ml-3 flex-1 min-w-0">
+              <h3 class="font-semibold text-sm text-gray-900 dark:text-white truncate">
+                {{ student.name }}
+              </h3>
+              <p
+                v-if="student.parentName"
+                class="text-xs text-gray-500 dark:text-gray-400 truncate"
+              >
+                {{ student.parentName }}
+              </p>
+            </div>
           </div>
-          
-          <div class="flex flex-col items-end space-y-3 flex-shrink-0">
+
+          <div class="flex items-center space-x-3 flex-shrink-0">
             <div class="flex items-center space-x-2">
-              <div :class="[
-                'w-4 h-4 rounded-full flex-shrink-0',
-                student.balance >= 15 ? 'bg-green-400' : student.balance >= 12 ? 'bg-yellow-400' : 'bg-red-400'
-              ]"></div>
-              <span :class="getBalanceClass(student.balance)" class="font-bold text-lg">
+              <div
+                :class="[
+                  'w-2.5 h-2.5 rounded-full flex-shrink-0',
+                  student.balance >= 15
+                    ? 'bg-green-500'
+                    : student.balance >= 12
+                      ? 'bg-yellow-500'
+                      : 'bg-red-500',
+                ]"
+              ></div>
+              <span :class="getBalanceClass(student.balance)" class="font-semibold text-sm">
                 {{ store.formatCurrency(student.balance) }}
               </span>
             </div>
-            
-            <button 
+
+            <button
               @click.stop="store.openModal('consumption', student)"
-              class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0 min-w-[80px]"
+              class="px-2 py-1 text-xs font-medium text-white bg-blue-700 rounded hover:bg-blue-800 focus:ring-2 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 flex-shrink-0"
             >
               Consumo
             </button>
@@ -68,71 +67,88 @@
     </div>
 
     <!-- Layout para Desktop (Tabela) -->
-    <div class="hidden sm:block bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-      <div class="overflow-x-hidden" style="overflow-x: hidden !important; max-width: 100%; width: 100%;">
-        <table class="w-full divide-y divide-gray-200 dark:divide-gray-600 table-fixed" style="table-layout: fixed; width: 100%; max-width: 100%;">
-        <thead>
-          <tr class="bg-blue-600 dark:bg-blue-700">
-            <th class="px-4 py-3 text-left text-sm font-semibold text-white tracking-wide w-1/2">
-              Nome
-            </th>
-            <th class="px-4 py-3 text-left text-sm font-semibold text-white tracking-wide w-1/4">
-              Saldo
-            </th>
-            <th class="px-4 py-3 text-right text-sm font-semibold text-white tracking-wide w-1/4">
-              Ações
-            </th>
+    <div class="hidden sm:block relative overflow-x-auto shadow-md sm:rounded-lg">
+      <div class="flex items-center justify-end flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white dark:bg-gray-900">
+        <label for="table-search" class="sr-only">Search</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg
+              class="w-4 h-4 text-gray-500 dark:text-gray-400"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 20 20"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+              />
+            </svg>
+          </div>
+          <input
+            v-model="searchTerm"
+            type="text"
+            id="table-search-users"
+            class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="Buscar alunos"
+          />
+        </div>
+      </div>
+      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" class="px-4 py-3">Nome</th>
+            <th scope="col" class="px-3 py-3">Saldo</th>
+            <th scope="col" class="px-2 py-3">Ações</th>
           </tr>
         </thead>
         <tbody>
-          <tr 
-            v-for="(student, index) in filteredStudents" 
+          <tr
+            v-for="(student, index) in filteredStudents"
             :key="student.id"
-            :class="[
-               'border-t border-gray-200 dark:border-gray-600 cursor-pointer transition-colors duration-200',
-               index % 2 === 0 
-                 ? 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700' 
-                 : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
-             ]"
+            class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
             @click="selectStudent(student)"
           >
-            <td class="px-4 py-4 w-1/2" style="max-width: 50%; overflow: hidden; word-wrap: break-word;">
-              <div class="flex items-center">
-                <div class="flex-1 min-w-0">
-                  <div class="font-semibold text-sm text-gray-900 dark:text-white truncate">
-                    {{ student.name }}
-                  </div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400 truncate mt-1" v-if="student.parentName">
-                    {{ student.parentName }}
-                  </div>
-                </div>
+            <th scope="row" class="flex items-center px-4 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
+                {{ student.name.charAt(0).toUpperCase() }}
               </div>
-            </td>
-            <td class="px-4 py-4 w-1/4" style="max-width: 25%; overflow: hidden;">
-              <div class="flex items-center space-x-2">
-                <div class="flex-shrink-0">
-                  <div :class="[
-                    'w-3 h-3 rounded-full',
-                    student.balance >= 15 ? 'bg-green-400' : student.balance >= 12 ? 'bg-yellow-400' : 'bg-red-400'
-                  ]"></div>
-                </div>
-                <span :class="getBalanceClass(student.balance)" class="font-semibold text-sm truncate">
+              <div class="ps-2">
+                <div class="text-sm font-semibold">{{ student.name }}</div>
+                <div class="font-normal text-gray-500 text-xs" v-if="student.parentName">{{ student.parentName }}</div>
+              </div>
+            </th>
+            <td class="px-3 py-4">
+              <div class="flex items-center">
+                <div
+                  :class="[
+                    'h-2.5 w-2.5 rounded-full me-2',
+                    student.balance >= 15
+                      ? 'bg-green-500'
+                      : student.balance >= 12
+                        ? 'bg-yellow-500'
+                        : 'bg-red-500',
+                  ]"
+                ></div>
+                <span :class="getBalanceClass(student.balance)" class="font-semibold">
                   {{ store.formatCurrency(student.balance) }}
                 </span>
               </div>
             </td>
-            <td class="px-4 py-4 w-1/4 text-right text-sm font-medium" style="max-width: 25%; overflow: hidden;">
-              <button 
-                @click.stop="store.openModal('consumption', student)"
-                class="compact-action-button"
-              >
-                Consumo
-              </button>
-            </td>
+            <td class="px-2 py-4">
+               <button
+                 @click.stop="store.openModal('consumption', student)"
+                 class="px-2 py-1 text-xs font-medium text-white bg-blue-700 rounded hover:bg-blue-800 focus:ring-2 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+               >
+                 Consumo
+               </button>
+             </td>
           </tr>
         </tbody>
       </table>
-      </div>
     </div>
   </div>
 </template>
@@ -149,11 +165,11 @@ const filteredStudents = computed(() => {
   if (!searchTerm.value) {
     return store.students
   }
-  return store.students.filter(student => {
+  return store.students.filter((student) => {
     const name = (student.name || '').toLowerCase()
     const parentName = (student.parentName || '').toLowerCase()
     const searchValue = searchTerm.value.toLowerCase()
-    
+
     return name.includes(searchValue) || parentName.includes(searchValue)
   })
 })
@@ -197,7 +213,7 @@ function getBalanceClass(balance: number) {
   color: white;
   border-radius: 4px;
   cursor: pointer;
-  transition: .3s;
+  transition: 0.3s;
   min-width: 60px;
 }
 
@@ -231,19 +247,25 @@ function getBalanceClass(balance: number) {
   border-radius: 0.375rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 2px 4px -1px rgba(0, 0, 0, 0.1),
+    0 1px 2px -1px rgba(0, 0, 0, 0.06);
   min-width: 80px;
 }
 
 .compact-action-button:hover {
   background: #1d4ed8;
   transform: translateY(-1px);
-  box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 6px 10px -2px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.05);
 }
 
 .compact-action-button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 2px 4px -1px rgba(0, 0, 0, 0.1),
+    0 1px 2px -1px rgba(0, 0, 0, 0.06);
 }
 
 @media (min-width: 640px) {
@@ -282,7 +304,8 @@ tbody tr:hover {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -344,7 +367,9 @@ tbody tr:hover {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border: 2px solid #000000;
   border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
   background-clip: padding-box;
   position: relative;
@@ -360,7 +385,9 @@ tbody tr:hover {
   border-radius: 12px;
   padding: 2px;
   background: #3b82f6;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   mask-composite: exclude;
   z-index: -1;
 }
@@ -369,14 +396,18 @@ tbody tr:hover {
   outline: none;
   border-color: #000000;
   border-width: 3px;
-  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1), 0 8px 25px -5px rgba(0, 0, 0, 0.3);
+  box-shadow:
+    0 0 0 4px rgba(0, 0, 0, 0.1),
+    0 8px 25px -5px rgba(0, 0, 0, 0.3);
   transform: translateY(-2px);
   background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
 }
 
 .modern-search-input:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px -3px rgba(59, 130, 246, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 6px 20px -3px rgba(59, 130, 246, 0.15),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .modern-search-input::placeholder {
@@ -394,11 +425,15 @@ tbody tr:hover {
   background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
   border-color: #000000;
   border-width: 3px;
-  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.2), 0 8px 25px -5px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 0 0 4px rgba(0, 0, 0, 0.2),
+    0 8px 25px -5px rgba(0, 0, 0, 0.4);
 }
 
 .dark .modern-search-input:hover {
-  box-shadow: 0 6px 20px -3px rgba(147, 51, 234, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 6px 20px -3px rgba(147, 51, 234, 0.15),
+    0 4px 6px -2px rgba(0, 0, 0, 0.1);
 }
 
 .dark .modern-search-input::placeholder {

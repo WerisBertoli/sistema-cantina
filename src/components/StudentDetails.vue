@@ -184,8 +184,6 @@ const openNegativeBalanceMessage = () => {
   max-width: 600px;
   width: 100%;
   margin: 0 auto;
-  border-radius: 20px;
-  @apply shadow-[0_10px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_30px_rgba(255,255,255,0.1)];
   animation: slideUp 0.6s ease-out;
   gap: 1.5rem;
 }
@@ -208,17 +206,15 @@ const openNegativeBalanceMessage = () => {
 }
 
 .balance-container {
-  @apply bg-gray-600 dark:bg-gray-700;
-  border-radius: 16px;
+  @apply bg-gray-50 dark:bg-gray-800;
+  border-radius: 12px;
   padding: 1.25rem 1.5rem;
   text-align: center;
-  @apply shadow-[0_8px_32px_rgba(0,0,0,0.2)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)];
-  backdrop-filter: blur(10px);
-  @apply border border-gray-500/50 dark:border-gray-600/50;
+  @apply border border-gray-200 dark:border-gray-700;
   position: relative;
   overflow: hidden;
   width: 100%;
-  @apply text-white;
+  @apply text-gray-900 dark:text-white;
 }
 
 .student-name {
@@ -226,8 +222,7 @@ const openNegativeBalanceMessage = () => {
   font-weight: 700;
   margin-bottom: 0.75rem;
   text-align: center;
-  color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  @apply text-gray-900 dark:text-white;
 }
 
 .balance-label {
@@ -257,7 +252,6 @@ const openNegativeBalanceMessage = () => {
   font-size: 3rem;
   font-weight: 800;
   line-height: 1;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .balance-indicator {
@@ -267,8 +261,7 @@ const openNegativeBalanceMessage = () => {
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  @apply bg-gray-300 dark:bg-gray-500;
-  backdrop-filter: blur(10px);
+  @apply bg-gray-200 dark:bg-gray-700;
   font-weight: 600;
   font-size: 0.875rem;
   @apply text-gray-800 dark:text-white;
@@ -326,8 +319,8 @@ const openNegativeBalanceMessage = () => {
 }
 
 .action-card {
-  @apply bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700;
-  border-radius: 16px;
+  @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700;
+  border-radius: 12px;
   padding: 1.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -356,8 +349,8 @@ const openNegativeBalanceMessage = () => {
 }
 
 .action-card:hover {
-  transform: translateY(-4px);
-  @apply shadow-[0_12px_24px_rgba(0,0,0,0.1)] dark:shadow-[0_12px_24px_rgba(255,255,255,0.1)];
+  transform: translateY(-2px);
+  @apply bg-gray-50 dark:bg-gray-700;
 }
 
 .action-icon {
