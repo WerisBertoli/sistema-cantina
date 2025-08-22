@@ -116,7 +116,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto pb-16 sm:pb-20">
+    <main class="flex-1 overflow-y-auto pb-20 sm:pb-24">
       <!-- Students List -->
       <StudentsList v-if="!store.currentStudent && store.activeTab === 'students'" />
 

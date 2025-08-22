@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white dark:bg-gray-900" style="overflow-x: hidden !important; max-width: 100vw; width: 100%;">
+  <div class="bg-white dark:bg-gray-900 pb-6 sm:pb-8" style="overflow-x: hidden !important; max-width: 100vw; width: 100%;">
     <div class="px-3 pt-3 pb-2 sm:px-4 sm:pt-4 bg-white dark:bg-gray-900">
       <h2 class="modern-title text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-blue-600 dark:text-blue-400 text-center">
         Lista de Alunos
