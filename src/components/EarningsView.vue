@@ -107,53 +107,40 @@
         <div
           v-for="transaction in visibleTransactions"
           :key="transaction.id"
-          :class="[
-            'flex items-center justify-between p-4 rounded-xl border hover:shadow-md transition-all duration-200',
-            transaction.type === 'credit'
-              ? 'bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-700'
-              : 'bg-gradient-to-r from-gray-50 to-green-50 dark:from-gray-700 dark:to-gray-600 border-gray-200 dark:border-gray-600',
-          ]"
+          class="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-200 dark:border-gray-700"
         >
-          <div class="flex items-center flex-1 min-w-0">
-            <div class="flex-1 min-w-0">
-              <p class="font-semibold text-gray-800 dark:text-white text-lg truncate">
-                {{ getStudentName(transaction.studentId) }}
-              </p>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ formatDate(transaction.date) }}
-              </p>
-              <div
-                v-if="transaction.items && transaction.items.length > 0"
-                class="text-xs text-gray-500 dark:text-gray-400 mt-1"
-              >
-                <div
-                  v-for="item in transaction.items"
-                  :key="item.productName"
-                  class="leading-tight"
-                >
-                  {{ item.quantity }}x {{ item.productName }}
-                </div>
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-medium text-gray-900 dark:text-white text-sm">
+                  {{ getStudentName(transaction.studentId) }}
+                </h3>
+                <span :class="[
+                  'text-sm font-medium',
+                  transaction.type === 'credit' ? 'text-blue-600 dark:text-blue-400' : 'text-green-600 dark:text-green-400'
+                ]">
+                  {{ transaction.type === 'credit' ? '+' : '' }}{{ formatCurrency(transaction.value) }}
+                </span>
               </div>
-              <div
-                v-if="transaction.type === 'credit'"
-                class="text-xs text-blue-600 dark:text-blue-400 mt-1 font-medium"
-              >
-                Recarga de crédito
+              
+              <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                <span>{{ formatDate(transaction.date) }}</span>
+                <span :class="[
+                  'px-2 py-1 rounded text-xs',
+                  transaction.type === 'credit' 
+                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
+                    : 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                ]">
+                  {{ transaction.type === 'credit' ? 'Recarga' : 'Consumo' }}
+                </span>
+              </div>
+              
+              <div v-if="transaction.items && transaction.items.length > 0" class="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                <span v-for="(item, index) in transaction.items" :key="item.productName">
+                  {{ item.quantity }}x {{ item.productName }}<span v-if="index < transaction.items.length - 1">, </span>
+                </span>
               </div>
             </div>
-          </div>
-          <div class="text-right flex-shrink-0 ml-4">
-            <p
-              :class="[
-                'font-bold text-lg whitespace-nowrap',
-                transaction.type === 'credit' ? 'text-blue-600' : 'text-green-600',
-              ]"
-            >
-              {{ transaction.type === 'credit' ? '+' : '' }}{{ formatCurrency(transaction.value) }}
-            </p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-              {{ transaction.type === 'credit' ? 'Recarga' : 'Consumo' }}
-            </p>
           </div>
         </div>
 
