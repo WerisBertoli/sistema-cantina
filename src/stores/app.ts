@@ -550,13 +550,8 @@ export const useAppStore = defineStore('app', () => {
       }
       
       const docRef = await addDoc(collection(db, 'prepaidTransactions'), orderData)
-      const newOrder: PrepaidOrder = {
-        id: docRef.id,
-        ...orderData
-      }
-      
-      prepaidOrders.value.push(newOrder)
-      console.log('Pedido pré-pago adicionado:', newOrder)
+      console.log('Pedido pré-pago adicionado com ID:', docRef.id)
+      // O onSnapshot listener irá automaticamente atualizar o array prepaidOrders
     } catch (error) {
       console.error('Erro ao adicionar pedido pré-pago:', error)
       throw error
