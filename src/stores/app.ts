@@ -4,6 +4,7 @@ import type {
   Student,
   Product,
   Transaction,
+  TransactionItem,
   CartItem,
   Earnings,
   ModalState,
@@ -302,6 +303,29 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  const deleteStudent = async (studentId: string) => {
+    try {
+      // Deletar o aluno do Firestore
+      await deleteDoc(doc(db, 'alunos', studentId))
+
+      // Remover o aluno da lista local
+      const index = students.value.findIndex((s) => s.id === studentId)
+      if (index !== -1) {
+        students.value.splice(index, 1)
+      }
+
+      // Se o aluno deletado era o currentStudent, limpar a seleção
+      if (currentStudent.value?.id === studentId) {
+        currentStudent.value = null
+      }
+
+      closeModal()
+    } catch (error) {
+      console.error('Erro ao deletar aluno:', error)
+      throw error
+    }
+  }
+
   const addProduct = async (product: Omit<Product, 'id'>) => {
     try {
       // Converter para os nomes de campos do Firebase
@@ -417,6 +441,158 @@ export const useAppStore = defineStore('app', () => {
     } catch (error) {
       console.error('Erro ao editar transação de crédito:', error)
       throw error
+    }
+  }
+
+  const editConsumptionTransaction = async (
+    transactionId: string,
+    newItems: TransactionItem[],
+    studentId: string,
+  ): Promise<void> => {
+    console.log('🔍 Iniciando editConsumptionTransaction:', { transactionId, newItems, studentId })
+
+    // Verificar se o usuário está autenticado
+    if (!auth.currentUser) {
+      console.log('⚠️ Usuário não autenticado, tentando login anônimo...')
+      try {
+        const { signInAnonymous } = await import('@/firebase')
+        await signInAnonymous()
+        console.log('✅ Login anônimo realizado com sucesso')
+      } catch (error) {
+        console.error('❌ Erro no login anônimo:', error)
+        throw new Error('Falha na autenticação')
+      }
+    }
+
+    console.log('👤 Usuário autenticado:', auth.currentUser?.uid)
+
+    // Encontrar a transação original primeiro
+    console.log('🔍 Procurando transação com ID:', transactionId)
+    const originalTransaction = transactions.value.find((t) => t.id === transactionId)
+    if (!originalTransaction) {
+      console.error('❌ Transação não encontrada!')
+      throw new Error('Transação não encontrada')
+    }
+
+    console.log('✅ Transação encontrada:', originalTransaction)
+
+    // Calcular novo valor total
+    const newValue = newItems.reduce((sum, item) => sum + item.quantity * item.price, 0)
+    const oldValue = Math.abs(originalTransaction.value)
+    const difference = newValue - oldValue
+    console.log('💰 Valores calculados:', { newValue, oldValue, difference })
+
+    // Implementar estratégia de retry com backoff exponencial
+    const maxRetries = 5
+    let retryDelay = 1000 // Começar com 1 segundo
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      console.log(`🔄 Tentativa ${attempt}/${maxRetries}`)
+
+      try {
+        // Usar uma abordagem mais simples sem batch para reduzir complexidade
+        await performSimpleEdit(
+          transactionId,
+          originalTransaction,
+          newItems,
+          newValue,
+          difference,
+          studentId,
+        )
+
+        console.log('✅ Operação concluída com sucesso!')
+        return // Sucesso, sair da função
+      } catch (error: any) {
+        console.error(`❌ Erro na tentativa ${attempt}:`, error)
+
+        // Verificar se é um erro que justifica retry
+        const shouldRetry = shouldRetryError(error)
+
+        if (attempt === maxRetries || !shouldRetry) {
+          console.error('❌ Falha definitiva após todas as tentativas')
+          throw error
+        }
+
+        // Backoff exponencial com jitter
+        const jitter = Math.random() * 500 // Adicionar aleatoriedade
+        const delay = retryDelay + jitter
+        console.log(`⏳ Aguardando ${delay}ms antes da próxima tentativa...`)
+        await new Promise((resolve) => setTimeout(resolve, delay))
+        retryDelay *= 2 // Dobrar o delay para a próxima tentativa
+      }
+    }
+  }
+
+  const shouldRetryError = (error: any): boolean => {
+    const errorMessage = error.message?.toLowerCase() || ''
+    const errorCode = error.code?.toLowerCase() || ''
+
+    // Erros que justificam retry
+    const retryableErrors = [
+      'err_aborted',
+      'network',
+      'timeout',
+      'unavailable',
+      'deadline-exceeded',
+      'aborted',
+      'cancelled',
+      'connection',
+      'fetch',
+    ]
+
+    return retryableErrors.some(
+      (retryableError) =>
+        errorMessage.includes(retryableError) || errorCode.includes(retryableError),
+    )
+  }
+
+  const performSimpleEdit = async (
+    transactionId: string,
+    originalTransaction: Transaction,
+    newItems: TransactionItem[],
+    newValue: number,
+    difference: number,
+    studentId: string,
+  ) => {
+    // Atualizar a transação primeiro
+    const transactionRef = doc(db, 'transactions', transactionId)
+
+    console.log('📝 Atualizando transação...')
+    await updateDoc(transactionRef, {
+      value: -newValue, // Negativo para consumo
+      items: newItems,
+    })
+    console.log('✅ Transação atualizada no Firestore')
+
+    // Atualizar saldo do aluno usando a coleção correta 'alunos'
+    const student = students.value.find((s) => s.id === studentId)
+    if (student) {
+      const studentRef = doc(db, 'alunos', studentId)
+
+      // CORREÇÃO: Se o novo valor é menor que o antigo (difference negativo),
+      // significa que removemos itens, então devemos ADICIONAR ao saldo
+      // Se o novo valor é maior (difference positivo), devemos SUBTRAIR do saldo
+      const oldValue = Math.abs(originalTransaction.value)
+      const balanceChange = -difference // Inverter o sinal da diferença
+      const newBalance = student.balance + balanceChange
+
+      console.log('💳 Atualizando saldo do aluno:', {
+        oldValue,
+        newValue,
+        difference,
+        balanceChange,
+        currentBalance: student.balance,
+        newBalance,
+      })
+
+      await updateDoc(studentRef, {
+        saldo: newBalance, // Usar campo 'saldo' do Firebase
+      })
+      console.log('✅ Saldo do aluno atualizado no Firestore')
+
+      // Atualizar saldo local apenas após sucesso no Firestore
+      student.balance = newBalance
+      console.log('💰 Saldo local do estudante atualizado. Novo saldo:', student.balance)
     }
   }
 
@@ -555,34 +731,100 @@ export const useAppStore = defineStore('app', () => {
     const oneWeekAgo = new Date()
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
-    const studentTransactions = transactions.value.filter(
-      (t) => t.studentId === student.id && t.date.toDate() >= oneWeekAgo,
-    )
+    const studentTransactions = transactions.value
+      .filter((t) => t.studentId === student.id && t.date.toDate() >= oneWeekAgo)
+      .sort((a, b) => a.date.toDate().getTime() - b.date.toDate().getTime())
 
-    const parentName = student.parentName || 'responsável'
-    let message = `📊 Resumo Semanal - ${student.name}\n\n`
-    message += `👨‍👩‍👧‍👦 Responsável: ${parentName}\n`
-    message += `💰 Saldo atual: ${formatCurrency(student.balance)}\n\n`
+    // Função para calcular saldo após uma transação específica
+    const getBalanceAfterTransaction = (targetTransaction: Transaction): number => {
+      // Obter todas as transações do aluno ordenadas por data (mais antigas primeiro)
+      const allTransactions = transactions.value
+        .filter((t) => t.studentId === student.id)
+        .sort((a, b) => a.date.toDate().getTime() - b.date.toDate().getTime())
 
-    if (studentTransactions.length === 0) {
-      message += `Nenhuma movimentação nos últimos 7 dias.\n\n`
-    } else {
-      message += `📝 Movimentações dos últimos 7 dias:\n\n`
+      // Encontrar o índice da transação alvo
+      const targetIndex = allTransactions.findIndex((t) => t.id === targetTransaction.id)
+      if (targetIndex === -1) return student.balance
 
-      studentTransactions.forEach((transaction) => {
-        const date = transaction.date.toDate().toLocaleDateString('pt-BR')
-        if (transaction.type === 'credit') {
-          message += `✅ ${date} - Recarga: ${formatCurrency(transaction.value)}\n`
-        } else {
-          message += `🛒 ${date} - Consumo: ${formatCurrency(Math.abs(transaction.value))}\n`
-          if (transaction.items) {
-            message += `   Items: ${transaction.items.map((item) => `${item.quantity}x ${item.productName}`).join(', ')}\n`
-          }
-        }
-      })
+      // Calcular o saldo inicial (saldo atual menos todas as transações após a transação alvo)
+      let balance = student.balance
+
+      // Subtrair todas as transações que aconteceram após a transação alvo
+      for (let i = targetIndex + 1; i < allTransactions.length; i++) {
+        const transaction = allTransactions[i]
+        balance -= transaction.value
+      }
+
+      return balance
     }
 
-    message += `\nCantina Digital 🏫`
+    const parentName = student.parentName || 'responsável'
+    let message = `📊 *RESUMO SEMANAL*\n`
+    message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`
+    message += `👤 *Aluno:* ${student.name}\n`
+    message += `👨‍👩‍👧‍👦 *Responsável:* ${parentName}\n`
+    message += `💰 *Saldo atual:* ${formatCurrency(student.balance)}\n\n`
+    message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`
+
+    if (studentTransactions.length === 0) {
+      message += `📭 *Nenhuma movimentação* nos últimos 7 dias.\n\n`
+    } else {
+      message += `📝 *MOVIMENTAÇÕES DOS ÚLTIMOS 7 DIAS:*\n\n`
+
+      // Separar recargas e consumos
+      const credits = studentTransactions.filter((t) => t.type === 'credit')
+      const consumptions = studentTransactions.filter((t) => t.type === 'consumption')
+
+      // Mostrar recargas primeiro
+      if (credits.length > 0) {
+        message += `💳 *RECARGAS:*\n`
+        credits.forEach((transaction) => {
+          const date = transaction.date.toDate().toLocaleDateString('pt-BR')
+          const time = transaction.date
+            .toDate()
+            .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+          message += `✅ ${date} às ${time}\n`
+          message += `   💰 Valor: ${formatCurrency(transaction.value)}\n\n`
+        })
+      }
+
+      // Mostrar consumos com saldo após cada transação
+      if (consumptions.length > 0) {
+        message += `🛒 *CONSUMOS:*\n`
+        consumptions.forEach((transaction) => {
+          const date = transaction.date.toDate().toLocaleDateString('pt-BR')
+          const time = transaction.date
+            .toDate()
+            .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+          const balanceAfter = getBalanceAfterTransaction(transaction)
+
+          message += `🛍️ ${date} às ${time}\n`
+          message += `   💸 Valor: ${formatCurrency(Math.abs(transaction.value))}\n`
+
+          if (transaction.items && transaction.items.length > 0) {
+            message += `   📦 Itens:\n`
+            transaction.items.forEach((item) => {
+              message += `      • ${item.quantity}x ${item.productName}\n`
+            })
+          }
+
+          message += `   💰 Saldo após compra: ${formatCurrency(balanceAfter)}\n\n`
+        })
+      }
+
+      // Resumo totais
+      const totalCredits = credits.reduce((sum, t) => sum + t.value, 0)
+      const totalConsumptions = Math.abs(consumptions.reduce((sum, t) => sum + t.value, 0))
+
+      message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`
+      message += `📊 *RESUMO DO PERÍODO:*\n`
+      message += `💳 Total em recargas: ${formatCurrency(totalCredits)}\n`
+      message += `🛒 Total em consumos: ${formatCurrency(totalConsumptions)}\n`
+      message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`
+    }
+
+    message += `🏫 *Cantina Digital*\n`
+    message += `📱 Sistema de gestão escolar`
     return message
   }
 
@@ -704,11 +946,13 @@ export const useAppStore = defineStore('app', () => {
     initializeApp,
     addStudent,
     updateStudent,
+    deleteStudent,
     addProduct,
     updateProduct,
     deleteProduct,
     addCredit,
     editCreditTransaction,
+    editConsumptionTransaction,
     processConsumption,
     addToCart,
     removeFromCart,

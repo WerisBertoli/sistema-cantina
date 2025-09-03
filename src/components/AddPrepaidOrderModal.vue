@@ -4,14 +4,7 @@
       <div class="modal-header">
         <h2 class="modal-title">Novo Pedido Pré-pago</h2>
         <button @click="closeModal" class="close-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -21,7 +14,7 @@
         <!-- Nome do Aluno -->
         <div class="form-group">
           <label class="form-label">Nome do Aluno</label>
-          <input
+          <input 
             type="text"
             v-model="studentName"
             class="form-input"
@@ -33,69 +26,62 @@
         <!-- Data do Pedido -->
         <div class="form-group">
           <label class="form-label">Data do Pedido</label>
-          <input type="date" v-model="orderDate" class="form-input" required />
+          <input 
+            type="date"
+            v-model="orderDate"
+            class="form-input"
+            required
+          />
         </div>
 
         <!-- Lista de Produtos por Categoria -->
         <div class="form-group">
           <label class="form-label">Produtos</label>
-
+          
           <!-- Lanches -->
           <div v-if="productsByCategory.lanche.length > 0" class="category-section">
             <h3 class="category-title">🥪 Lanches</h3>
             <div class="products-grid">
-              <div
-                v-for="product in productsByCategory.lanche"
-                :key="product.id"
+              <div 
+                v-for="product in productsByCategory.lanche" 
+                :key="product.id" 
                 class="product-card"
-                :class="{ selected: getProductQuantity(product.id!) > 0 }"
+                :class="{ 'selected': getProductQuantity(product.id!) > 0 }"
               >
                 <div class="product-image">
-                  <img
-                    v-if="product.imageUrl"
-                    :src="product.imageUrl"
+                  <img 
+                    v-if="product.imageUrl" 
+                    :src="product.imageUrl" 
                     :alt="product.name"
                     class="product-img"
                   />
-                  <div v-else class="product-placeholder">🥪</div>
+                  <div v-else class="product-placeholder">
+                    🥪
+                  </div>
                 </div>
                 <div class="product-info">
                   <h4 class="product-name">{{ product.name }}</h4>
                   <p class="product-price">{{ formatCurrency(product.price) }}</p>
                 </div>
                 <div class="quantity-controls">
-                  <button
+                  <button 
                     type="button"
                     @click="decreaseQuantity(product.id!)"
                     class="quantity-btn"
                     :disabled="getProductQuantity(product.id!) === 0"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-4 h-4"
-                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
                     </svg>
                   </button>
                   <span class="quantity-display">{{ getProductQuantity(product.id!) }}</span>
-                  <button type="button" @click="increaseQuantity(product.id!)" class="quantity-btn">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-4 h-4"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M12 4.5v15m7.5-7.5h-15"
-                      />
+                  <button 
+                    type="button"
+                    @click="increaseQuantity(product.id!)"
+                    class="quantity-btn"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
                   </button>
                 </div>
@@ -107,58 +93,46 @@
           <div v-if="productsByCategory.bebida.length > 0" class="category-section">
             <h3 class="category-title">🥤 Bebidas</h3>
             <div class="products-grid">
-              <div
-                v-for="product in productsByCategory.bebida"
-                :key="product.id"
+              <div 
+                v-for="product in productsByCategory.bebida" 
+                :key="product.id" 
                 class="product-card"
-                :class="{ selected: getProductQuantity(product.id!) > 0 }"
+                :class="{ 'selected': getProductQuantity(product.id!) > 0 }"
               >
                 <div class="product-image">
-                  <img
-                    v-if="product.imageUrl"
-                    :src="product.imageUrl"
+                  <img 
+                    v-if="product.imageUrl" 
+                    :src="product.imageUrl" 
                     :alt="product.name"
                     class="product-img"
                   />
-                  <div v-else class="product-placeholder">🥤</div>
+                  <div v-else class="product-placeholder">
+                    🥤
+                  </div>
                 </div>
                 <div class="product-info">
                   <h4 class="product-name">{{ product.name }}</h4>
                   <p class="product-price">{{ formatCurrency(product.price) }}</p>
                 </div>
                 <div class="quantity-controls">
-                  <button
+                  <button 
                     type="button"
                     @click="decreaseQuantity(product.id!)"
                     class="quantity-btn"
                     :disabled="getProductQuantity(product.id!) === 0"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-4 h-4"
-                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
                     </svg>
                   </button>
                   <span class="quantity-display">{{ getProductQuantity(product.id!) }}</span>
-                  <button type="button" @click="increaseQuantity(product.id!)" class="quantity-btn">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-4 h-4"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M12 4.5v15m7.5-7.5h-15"
-                      />
+                  <button 
+                    type="button"
+                    @click="increaseQuantity(product.id!)"
+                    class="quantity-btn"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
                   </button>
                 </div>
@@ -170,58 +144,46 @@
           <div v-if="productsByCategory.doces.length > 0" class="category-section">
             <h3 class="category-title">🍭 Doces</h3>
             <div class="products-grid">
-              <div
-                v-for="product in productsByCategory.doces"
-                :key="product.id"
+              <div 
+                v-for="product in productsByCategory.doces" 
+                :key="product.id" 
                 class="product-card"
-                :class="{ selected: getProductQuantity(product.id!) > 0 }"
+                :class="{ 'selected': getProductQuantity(product.id!) > 0 }"
               >
                 <div class="product-image">
-                  <img
-                    v-if="product.imageUrl"
-                    :src="product.imageUrl"
+                  <img 
+                    v-if="product.imageUrl" 
+                    :src="product.imageUrl" 
                     :alt="product.name"
                     class="product-img"
                   />
-                  <div v-else class="product-placeholder">🍭</div>
+                  <div v-else class="product-placeholder">
+                    🍭
+                  </div>
                 </div>
                 <div class="product-info">
                   <h4 class="product-name">{{ product.name }}</h4>
                   <p class="product-price">{{ formatCurrency(product.price) }}</p>
                 </div>
                 <div class="quantity-controls">
-                  <button
+                  <button 
                     type="button"
                     @click="decreaseQuantity(product.id!)"
                     class="quantity-btn"
                     :disabled="getProductQuantity(product.id!) === 0"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-4 h-4"
-                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
                     </svg>
                   </button>
                   <span class="quantity-display">{{ getProductQuantity(product.id!) }}</span>
-                  <button type="button" @click="increaseQuantity(product.id!)" class="quantity-btn">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-4 h-4"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M12 4.5v15m7.5-7.5h-15"
-                      />
+                  <button 
+                    type="button"
+                    @click="increaseQuantity(product.id!)"
+                    class="quantity-btn"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
                   </button>
                 </div>
@@ -229,6 +191,8 @@
             </div>
           </div>
         </div>
+
+
 
         <!-- Total -->
         <div class="total-section">
@@ -240,8 +204,16 @@
 
         <!-- Botões -->
         <div class="modal-actions">
-          <button type="button" @click="closeModal" class="cancel-button">Cancelar</button>
-          <button type="submit" class="submit-button" :disabled="!canSubmit">Criar Pedido</button>
+          <button type="button" @click="closeModal" class="cancel-button">
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="submit-button"
+            :disabled="!canSubmit"
+          >
+            Criar Pedido
+          </button>
         </div>
       </form>
     </div>
@@ -268,10 +240,10 @@ const productsByCategory = computed(() => {
   const categories = {
     lanche: [] as typeof store.products,
     bebida: [] as typeof store.products,
-    doces: [] as typeof store.products,
+    doces: [] as typeof store.products
   }
-
-  products.value.forEach((product) => {
+  
+  products.value.forEach(product => {
     const category = product.category?.toLowerCase() || 'lanche'
     if (category === 'lanche' || category === 'lanches') {
       categories.lanche.push(product)
@@ -284,13 +256,13 @@ const productsByCategory = computed(() => {
       categories.lanche.push(product)
     }
   })
-
+  
   return categories
 })
 
 const totalValue = computed(() => {
   let total = 0
-  orderItems.value.forEach((item) => {
+  orderItems.value.forEach(item => {
     total += item.price * item.quantity
   })
   return total
@@ -305,7 +277,7 @@ const getProductQuantity = (productId: string): number => {
 }
 
 const increaseQuantity = (productId: string) => {
-  const product = products.value.find((p) => p.id === productId)
+  const product = products.value.find(p => p.id === productId)
   if (!product) return
 
   const currentItem = orderItems.value.get(productId)
@@ -316,7 +288,7 @@ const increaseQuantity = (productId: string) => {
       productId,
       productName: product.name,
       quantity: 1,
-      price: product.price,
+      price: product.price
     })
   }
 }
@@ -365,6 +337,7 @@ const submitOrder = async () => {
     totalValue: totalValue.value,
     status: 'pending',
     createdAt: Timestamp.fromDate(selectedDate),
+    
   }
 
   try {
@@ -428,6 +401,8 @@ watch(isOpen, (newValue) => {
 .form-input {
   @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white;
 }
+
+
 
 .form-textarea {
   @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none;

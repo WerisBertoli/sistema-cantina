@@ -138,7 +138,7 @@
 
     <!-- Bottom Navigation -->
     <BottomNavigation @navigate="store.setActiveTab" :activeTab="store.activeTab" />
-    
+
     <!-- Confirm Dialog -->
     <ConfirmDialog></ConfirmDialog>
   </div>
@@ -268,7 +268,7 @@ onMounted(() => {
   animation: gradientShift 8s ease infinite;
   position: relative;
   overflow: hidden;
-  box-shadow: 
+  box-shadow:
     0 4px 20px rgba(0, 0, 0, 0.15),
     0 8px 40px rgba(102, 126, 234, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -394,10 +394,14 @@ onMounted(() => {
 
 @keyframes titleGlow {
   from {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 255, 255, 0.1);
+    text-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.3),
+      0 0 10px rgba(255, 255, 255, 0.1);
   }
   to {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.2);
+    text-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.3),
+      0 0 20px rgba(255, 255, 255, 0.2);
   }
 }
 
@@ -416,7 +420,7 @@ onMounted(() => {
 @media (max-width: 640px) {
   .modern-header {
     padding: 0.75rem 0.75rem 1rem 0.75rem;
-    box-shadow: 
+    box-shadow:
       0 2px 15px rgba(0, 0, 0, 0.1),
       0 4px 30px rgba(102, 126, 234, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -440,7 +444,7 @@ onMounted(() => {
 
 @media (min-width: 641px) {
   .modern-header {
-    box-shadow: 
+    box-shadow:
       0 6px 25px rgba(0, 0, 0, 0.15),
       0 10px 50px rgba(102, 126, 234, 0.25),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -452,7 +456,7 @@ onMounted(() => {
   background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #1d4ed8 100%);
   background-size: 200% 200%;
   animation: gradientShift 8s ease infinite;
-  box-shadow: 
+  box-shadow:
     0 4px 20px rgba(0, 0, 0, 0.3),
     0 8px 40px rgba(30, 58, 138, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -477,7 +481,7 @@ onMounted(() => {
 
 @media (max-width: 640px) {
   .dark .modern-header {
-    box-shadow: 
+    box-shadow:
       0 2px 15px rgba(0, 0, 0, 0.2),
       0 4px 30px rgba(30, 58, 138, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);

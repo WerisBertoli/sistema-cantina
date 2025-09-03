@@ -3,7 +3,7 @@
     <!-- Período Selecionado -->
     <div class="bg-blue-600 dark:bg-blue-700 p-4">
       <h2 class="text-lg font-semibold text-white mb-3">Período</h2>
-      <div class="flex space-x-2">
+      <div class="flex flex-wrap gap-2 mb-4">
         <button
           v-for="period in periods"
           :key="period.value"
@@ -17,6 +17,35 @@
         >
           {{ period.label }}
         </button>
+      </div>
+      
+      <!-- Seletor de Mês/Ano (aparece quando 'Mês Específico' está selecionado) -->
+      <div v-if="selectedPeriod === 'custom'" class="flex flex-wrap gap-3 items-center">
+        <div class="flex flex-col">
+          <label class="text-sm text-blue-100 mb-1">Mês</label>
+          <select
+            v-model="selectedMonth"
+            @change="resetPagination"
+            class="px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option v-for="month in months" :key="month.value" :value="month.value">
+              {{ month.label }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="flex flex-col">
+          <label class="text-sm text-blue-100 mb-1">Ano</label>
+          <select
+            v-model="selectedYear"
+            @change="resetPagination"
+            class="px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option v-for="year in availableYears" :key="year" :value="year">
+              {{ year }}
+            </option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -214,16 +243,49 @@ import type { TransactionItem } from '../types'
 
 const store = useAppStore()
 
-const selectedPeriod = ref<'daily' | 'weekly' | 'monthly'>('daily')
+const selectedPeriod = ref<'daily' | 'weekly' | 'monthly' | 'custom'>('daily')
 const transactionsToShow = ref(10) // Número inicial de transações a mostrar
+const selectedMonth = ref(new Date().getMonth())
+const selectedYear = ref(new Date().getFullYear())
 
 const periods = [
   { value: 'daily' as const, label: 'Hoje' },
   { value: 'weekly' as const, label: 'Semana' },
-  { value: 'monthly' as const, label: 'Mês' },
+  { value: 'monthly' as const, label: 'Mês Atual' },
+  { value: 'custom' as const, label: 'Mês Específico' },
 ]
 
+// Lista de meses para o seletor
+const months = [
+  { value: 0, label: 'Janeiro' },
+  { value: 1, label: 'Fevereiro' },
+  { value: 2, label: 'Março' },
+  { value: 3, label: 'Abril' },
+  { value: 4, label: 'Maio' },
+  { value: 5, label: 'Junho' },
+  { value: 6, label: 'Julho' },
+  { value: 7, label: 'Agosto' },
+  { value: 8, label: 'Setembro' },
+  { value: 9, label: 'Outubro' },
+  { value: 10, label: 'Novembro' },
+  { value: 11, label: 'Dezembro' },
+]
+
+// Gerar lista de anos disponíveis (últimos 3 anos + próximo ano)
+const availableYears = computed(() => {
+  const currentYear = new Date().getFullYear()
+  const years = []
+  for (let i = currentYear - 2; i <= currentYear + 1; i++) {
+    years.push(i)
+  }
+  return years
+})
+
 const currentPeriodLabel = computed(() => {
+  if (selectedPeriod.value === 'custom') {
+    const monthName = months.find(m => m.value === selectedMonth.value)?.label || 'Janeiro'
+    return `${monthName} ${selectedYear.value}`
+  }
   const period = periods.find((p) => p.value === selectedPeriod.value)
   return period ? period.label : 'Hoje'
 })
@@ -236,10 +298,25 @@ const currentEarnings = computed(() => {
       return store.earnings.thisWeek
     case 'monthly':
       return store.earnings.thisMonth
+    case 'custom':
+      return calculateCustomMonthEarnings()
     default:
       return store.earnings.today
   }
 })
+
+// Função para calcular ganhos de um mês específico
+const calculateCustomMonthEarnings = (): number => {
+  const startDate = new Date(selectedYear.value, selectedMonth.value, 1)
+  const endDate = new Date(selectedYear.value, selectedMonth.value + 1, 0, 23, 59, 59, 999)
+  
+  return store.transactions
+    .filter((t) => {
+      const transactionDate = t.date.toDate()
+      return t.type === 'credit' && transactionDate >= startDate && transactionDate <= endDate
+    })
+    .reduce((sum, t) => sum + t.value, 0)
+}
 
 const filteredTransactions = computed(() => {
   const now = new Date()
@@ -249,6 +326,8 @@ const filteredTransactions = computed(() => {
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
   let startDate: Date
+  let endDate: Date | null = null
+  
   switch (selectedPeriod.value) {
     case 'daily':
       startDate = startOfDay
@@ -259,12 +338,22 @@ const filteredTransactions = computed(() => {
     case 'monthly':
       startDate = startOfMonth
       break
+    case 'custom':
+      startDate = new Date(selectedYear.value, selectedMonth.value, 1)
+      endDate = new Date(selectedYear.value, selectedMonth.value + 1, 0, 23, 59, 59, 999)
+      break
     default:
       startDate = startOfDay
   }
 
   return store.transactions
-    .filter((t) => t.date.toDate() >= startDate)
+    .filter((t) => {
+      const transactionDate = t.date.toDate()
+      if (endDate) {
+        return transactionDate >= startDate && transactionDate <= endDate
+      }
+      return transactionDate >= startDate
+    })
     .sort((a, b) => b.date.toDate().getTime() - a.date.toDate().getTime())
 })
 
@@ -287,7 +376,7 @@ const resetPagination = () => {
 }
 
 // Reset pagination when period changes
-const changePeriod = (period: 'daily' | 'weekly' | 'monthly') => {
+const changePeriod = (period: 'daily' | 'weekly' | 'monthly' | 'custom') => {
   selectedPeriod.value = period
   resetPagination()
 }

@@ -24,10 +24,10 @@ const isLoading = computed(() => store.isLoading || isAuthLoading.value || !isAp
 const initializeApp = async () => {
   // Aguardar autenticação
   while (getAuthLoadingState()) {
-    await new Promise(resolve => setTimeout(resolve, 50))
+    await new Promise((resolve) => setTimeout(resolve, 50))
   }
   isAuthLoading.value = false
-  
+
   // Inicializar store
   await store.initializeApp()
   isAppInitialized.value = true
