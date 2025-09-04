@@ -2,40 +2,42 @@
   <div class="modal-overlay" @click="store.closeModal()">
     <div class="modal-content-large max-h-[90vh] overflow-y-auto" @click.stop>
       <div
-        class="flex justify-between items-center mb-3 sm:mb-4 bg-white dark:bg-gray-800 pb-2 sm:pb-3 border-b dark:border-gray-600"
-      >
-        <div class="flex items-center">
-          <svg
-            class="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600 dark:text-blue-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-            ></path>
-          </svg>
-          <h2 class="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">
-            Histórico Semanal
-          </h2>
-        </div>
-        <button
-          @click="store.closeModal()"
-          class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          class="flex justify-between items-center mb-3 sm:mb-4 bg-white dark:bg-gray-800 pb-2 sm:pb-3 border-b dark:border-gray-600"
         >
-          <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            ></path>
-          </svg>
-        </button>
-      </div>
+          <div class="flex items-center">
+            <svg
+              class="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-blue-600 dark:text-blue-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              ></path>
+            </svg>
+            <h2 class="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">
+              Histórico Semanal
+            </h2>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button
+              @click="store.closeModal()"
+              class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1 sm:p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
 
       <!-- Informações do Aluno -->
       <div
@@ -67,30 +69,16 @@
       </div>
 
       <!-- Seletor de Semana -->
-      <div
-        class="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
-      >
-        <div
-          class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0"
-        >
+      <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <div class="flex items-center">
-            <svg
-              class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              ></path>
+            <svg class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Período:</label>
           </div>
-          <select
-            v-model="selectedWeekOffset"
+          <select 
+            v-model="selectedWeekOffset" 
             @change="updateSelectedWeek"
             class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
@@ -308,20 +296,15 @@
                   class="flex justify-between text-xs"
                 >
                   <span class="text-gray-700">{{ item.quantity }}x {{ item.productName }}</span>
-                  <span class="text-gray-600">{{
-                    store.formatCurrency(item.quantity * item.price)
-                  }}</span>
+                  <span class="text-gray-600">{{store.formatCurrency(item.quantity * item.price)}}</span>
                 </div>
               </div>
-
+              
               <!-- Saldo após a transação -->
               <div class="mt-2 pt-2 border-t border-gray-200">
                 <div class="flex items-center justify-between">
                   <span class="text-xs text-gray-500">Saldo após transação:</span>
-                  <span
-                    class="text-xs font-medium"
-                    :class="getBalanceClass(getBalanceAfterTransaction(transaction))"
-                  >
+                  <span class="text-xs font-medium" :class="getBalanceClass(getBalanceAfterTransaction(transaction))">
                     {{ store.formatCurrency(getBalanceAfterTransaction(transaction)) }}
                   </span>
                 </div>
@@ -418,7 +401,7 @@
   <div
     v-if="isEditConsumptionModalOpen"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
-    style="z-index: 1200"
+    style="z-index: 1200;"
     @click.self="closeEditConsumptionModal"
   >
     <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -430,36 +413,20 @@
             class="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         <div v-if="editingConsumption" class="space-y-4">
           <div class="text-sm text-gray-600 mb-4">
-            <p>
-              <strong>Data:</strong>
-              {{ new Date(editingConsumption.date.toDate()).toLocaleDateString('pt-BR') }}
-            </p>
-            <p>
-              <strong>Horário:</strong>
-              {{
-                new Date(editingConsumption.date.toDate()).toLocaleTimeString('pt-BR', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })
-              }}
-            </p>
+            <p><strong>Data:</strong> {{ new Date(editingConsumption.date.toDate()).toLocaleDateString('pt-BR') }}</p>
+            <p><strong>Horário:</strong> {{ new Date(editingConsumption.date.toDate()).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) }}</p>
           </div>
 
           <div class="space-y-3">
             <h4 class="font-medium text-gray-900">Itens do Consumo:</h4>
-
+            
             <!-- Barra de Pesquisa para Adicionar Produtos -->
             <div class="mb-4 p-3 bg-gray-50 rounded-lg">
               <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -474,12 +441,9 @@
                   @input="filterProducts"
                 />
               </div>
-
+              
               <!-- Lista de Produtos Filtrados -->
-              <div
-                v-if="searchQuery && filteredProducts.length > 0"
-                class="mt-2 max-h-32 overflow-y-auto border border-gray-200 rounded-md bg-white"
-              >
+              <div v-if="searchQuery && filteredProducts.length > 0" class="mt-2 max-h-32 overflow-y-auto border border-gray-200 rounded-md bg-white">
                 <div
                   v-for="product in filteredProducts"
                   :key="product.id"
@@ -490,19 +454,12 @@
                   <span class="text-sm text-gray-500">{{ formatCurrency(product.price) }}</span>
                 </div>
               </div>
-
-              <div
-                v-if="searchQuery && filteredProducts.length === 0"
-                class="mt-2 text-sm text-gray-500"
-              >
+              
+              <div v-if="searchQuery && filteredProducts.length === 0" class="mt-2 text-sm text-gray-500">
                 Nenhum produto encontrado
               </div>
             </div>
-            <div
-              v-for="(item, index) in editedItems"
-              :key="index"
-              class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-            >
+            <div v-for="(item, index) in editedItems" :key="index" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
               <div class="flex-1">
                 <p class="font-medium text-gray-900">{{ item.productName }}</p>
                 <p class="text-sm text-gray-600">{{ formatCurrency(item.price) }} cada</p>
@@ -514,12 +471,7 @@
                   class="w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M20 12H4"
-                    />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
                   </svg>
                 </button>
                 <span class="w-8 text-center font-medium">{{ item.quantity }}</span>
@@ -528,12 +480,7 @@
                   class="w-8 h-8 rounded-full bg-green-100 text-green-600 hover:bg-green-200 flex items-center justify-center transition-colors"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
                 </button>
                 <button
@@ -541,12 +488,7 @@
                   class="ml-2 w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-colors"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </button>
               </div>
@@ -556,11 +498,7 @@
           <div class="border-t pt-4">
             <div class="flex justify-between items-center text-lg font-semibold">
               <span>Total:</span>
-              <span>{{
-                formatCurrency(
-                  editedItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
-                )
-              }}</span>
+              <span>{{ formatCurrency(editedItems.reduce((sum, item) => sum + (item.quantity * item.price), 0)) }}</span>
             </div>
           </div>
 
@@ -607,8 +545,8 @@ const editedItems = ref<TransactionItem[]>([])
 const isSubmittingConsumption = ref(false)
 
 // Variáveis para pesquisa de produtos
-const searchQuery = ref('')
-const filteredProducts = ref<Product[]>([])
+  const searchQuery = ref('');
+  const filteredProducts = ref<Product[]>([]);
 
 // Funções para pesquisa de produtos
 const filterProducts = () => {
@@ -616,15 +554,15 @@ const filterProducts = () => {
     filteredProducts.value = []
     return
   }
-
-  filteredProducts.value = store.products.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  
+  filteredProducts.value = store.products.filter(product => 
+    product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 }
 
 const addProductToConsumption = (product: Product) => {
-  const existingItemIndex = editedItems.value.findIndex((item) => item.productId === product.id)
-
+  const existingItemIndex = editedItems.value.findIndex(item => item.productId === product.id)
+  
   if (existingItemIndex >= 0) {
     editedItems.value[existingItemIndex].quantity += 1
   } else {
@@ -632,10 +570,10 @@ const addProductToConsumption = (product: Product) => {
       productId: product.id,
       productName: product.name,
       price: product.price,
-      quantity: 1,
+      quantity: 1
     })
   }
-
+  
   searchQuery.value = ''
   filteredProducts.value = []
 }
@@ -643,29 +581,37 @@ const addProductToConsumption = (product: Product) => {
 // Variáveis para seleção de semana
 const selectedWeekOffset = ref(0)
 
-// Gerar semanas disponíveis (últimas 8 semanas)
+// Gerar semanas disponíveis (semana atual + últimas 7 semanas)
 const availableWeeks = computed(() => {
   const weeks = []
   for (let i = 0; i < 8; i++) {
-    const startDate = new Date()
-    startDate.setDate(startDate.getDate() - i * 7 - 7)
+    const now = new Date()
+    
+    // Calcular o início da semana (domingo)
+    const startDate = new Date(now)
+    const dayOfWeek = now.getDay() // 0 = domingo, 1 = segunda, etc.
+    startDate.setDate(now.getDate() - dayOfWeek - (i * 7))
+    startDate.setHours(0, 0, 0, 0)
+    
+    // Calcular o fim da semana (sábado)
     const endDate = new Date(startDate)
-    endDate.setDate(endDate.getDate() + 6)
-
+    endDate.setDate(startDate.getDate() + 6)
+    endDate.setHours(23, 59, 59, 999)
+    
     let label
     if (i === 0) {
-      label = 'Última semana'
+      label = 'Esta semana'
     } else if (i === 1) {
-      label = 'Há 2 semanas'
+      label = 'Última semana'
     } else {
-      label = `Há ${i + 1} semanas`
+      label = `Há ${i} semanas`
     }
-
+    
     weeks.push({
       offset: i,
       label,
       startDate,
-      endDate,
+      endDate
     })
   }
   return weeks
@@ -673,15 +619,11 @@ const availableWeeks = computed(() => {
 
 // Descrição da semana selecionada
 const selectedWeekDescription = computed(() => {
-  const week = availableWeeks.value.find((w) => w.offset === selectedWeekOffset.value)
+  const week = availableWeeks.value.find(w => w.offset === selectedWeekOffset.value)
   if (!week) return ''
-
+  
   const start = week.startDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
-  const end = week.endDate.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
+  const end = week.endDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
   return `${start} a ${end}`
 })
 
@@ -694,23 +636,24 @@ const updateSelectedWeek = () => {
 const weeklyTransactions = computed(() => {
   if (!store.currentStudent) return []
 
-  const selectedWeek = availableWeeks.value.find((w) => w.offset === selectedWeekOffset.value)
+  const selectedWeek = availableWeeks.value.find(w => w.offset === selectedWeekOffset.value)
   if (!selectedWeek) return []
 
   const startDate = selectedWeek.startDate
   const endDate = new Date(selectedWeek.endDate)
   endDate.setHours(23, 59, 59, 999) // Incluir todo o último dia
 
-  return store.transactions
+  const filtered = store.transactions
     .filter((t) => {
       const transactionDate = t.date.toDate()
-      return (
-        t.studentId === store.currentStudent!.id &&
-        transactionDate >= startDate &&
-        transactionDate <= endDate
-      )
+      const isStudentMatch = t.studentId === store.currentStudent!.id
+      const isDateMatch = transactionDate >= startDate && transactionDate <= endDate
+      
+      return isStudentMatch && isDateMatch
     })
     .sort((a, b) => b.date.toDate().getTime() - a.date.toDate().getTime())
+  
+  return filtered
 })
 
 // Calcular totais
@@ -729,25 +672,25 @@ const totalConsumptions = computed(() => {
 // Função para calcular o saldo após uma transação específica
 const getBalanceAfterTransaction = (targetTransaction: Transaction): number => {
   if (!store.currentStudent) return 0
-
+  
   // Obter todas as transações do aluno ordenadas por data (mais antigas primeiro)
   const allTransactions = store.transactions
-    .filter((t) => t.studentId === store.currentStudent!.id)
+    .filter(t => t.studentId === store.currentStudent!.id)
     .sort((a, b) => a.date.toDate().getTime() - b.date.toDate().getTime())
-
+  
   // Encontrar o índice da transação alvo
-  const targetIndex = allTransactions.findIndex((t) => t.id === targetTransaction.id)
+  const targetIndex = allTransactions.findIndex(t => t.id === targetTransaction.id)
   if (targetIndex === -1) return store.currentStudent.balance
-
+  
   // Calcular o saldo inicial (saldo atual menos todas as transações após a transação alvo)
   let balance = store.currentStudent.balance
-
+  
   // Subtrair todas as transações que aconteceram após a transação alvo
   for (let i = targetIndex + 1; i < allTransactions.length; i++) {
     const transaction = allTransactions[i]
     balance -= transaction.value
   }
-
+  
   return balance
 }
 
@@ -879,7 +822,7 @@ const saveConsumptionEdit = async () => {
     await store.editConsumptionTransaction(
       editingConsumption.value.id!,
       editedItems.value,
-      store.currentStudent.id!,
+      store.currentStudent.id!
     )
     closeEditConsumptionModal()
   } catch (error) {
@@ -889,6 +832,8 @@ const saveConsumptionEdit = async () => {
     isSubmittingConsumption.value = false
   }
 }
+
+
 
 const saveEdit = async () => {
   if (!editingTransaction.value || !store.currentStudent || isSubmitting.value) return

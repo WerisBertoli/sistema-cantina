@@ -231,6 +231,14 @@ export const useAppStore = defineStore('app', () => {
             ...doc.data(),
           }) as Transaction,
       )
+      console.log(`Carregadas ${transactions.value.length} transações da coleção 'transactions'`)
+      
+      // Debug: mostrar transações por aluno
+      const transactionsByStudent = transactions.value.reduce((acc, t) => {
+        acc[t.studentId] = (acc[t.studentId] || 0) + 1
+        return acc
+      }, {} as Record<string, number>)
+      console.log('Transações por aluno:', transactionsByStudent)
     })
 
     // Carregar pedidos pré-pagos
@@ -250,6 +258,8 @@ export const useAppStore = defineStore('app', () => {
         `Carregados ${prepaidOrders.value.length} pedidos pré-pagos da coleção 'prepaidTransactions'`,
       )
     })
+
+
   }
 
   // const createSampleProducts = async () => {
