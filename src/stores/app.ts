@@ -745,97 +745,42 @@ export const useAppStore = defineStore('app', () => {
       .filter((t) => t.studentId === student.id && t.date.toDate() >= oneWeekAgo)
       .sort((a, b) => a.date.toDate().getTime() - b.date.toDate().getTime())
 
-    // Função para calcular saldo após uma transação específica
-    const getBalanceAfterTransaction = (targetTransaction: Transaction): number => {
-      // Obter todas as transações do aluno ordenadas por data (mais antigas primeiro)
-      const allTransactions = transactions.value
-        .filter((t) => t.studentId === student.id)
-        .sort((a, b) => a.date.toDate().getTime() - b.date.toDate().getTime())
-
-      // Encontrar o índice da transação alvo
-      const targetIndex = allTransactions.findIndex((t) => t.id === targetTransaction.id)
-      if (targetIndex === -1) return student.balance
-
-      // Calcular o saldo inicial (saldo atual menos todas as transações após a transação alvo)
-      let balance = student.balance
-
-      // Subtrair todas as transações que aconteceram após a transação alvo
-      for (let i = targetIndex + 1; i < allTransactions.length; i++) {
-        const transaction = allTransactions[i]
-        balance -= transaction.value
-      }
-
-      return balance
-    }
-
-    const parentName = student.parentName || 'responsável'
-    let message = `📊 *RESUMO SEMANAL*\n`
-    message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`
-    message += `👤 *Aluno:* ${student.name}\n`
-    message += `👨‍👩‍👧‍👦 *Responsável:* ${parentName}\n`
-    message += `💰 *Saldo atual:* ${formatCurrency(student.balance)}\n\n`
-    message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`
+    let message = ''
 
     if (studentTransactions.length === 0) {
-      message += `📭 *Nenhuma movimentação* nos últimos 7 dias.\n\n`
+      message = 'Sem movimentações nesta semana.'
     } else {
-      message += `📝 *MOVIMENTAÇÕES DOS ÚLTIMOS 7 DIAS:*\n\n`
-
       // Separar recargas e consumos
       const credits = studentTransactions.filter((t) => t.type === 'credit')
       const consumptions = studentTransactions.filter((t) => t.type === 'consumption')
 
-      // Mostrar recargas primeiro
+      // Mostrar recargas
       if (credits.length > 0) {
-        message += `💳 *RECARGAS:*\n`
+        message += `💳 *Recargas:*\n`
         credits.forEach((transaction) => {
-          const date = transaction.date.toDate().toLocaleDateString('pt-BR')
-          const time = transaction.date
-            .toDate()
-            .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-          message += `✅ ${date} às ${time}\n`
-          message += `   💰 Valor: ${formatCurrency(transaction.value)}\n\n`
+          const date = transaction.date.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+          message += `${date}: ${formatCurrency(transaction.value)}\n`
         })
+        message += `\n`
       }
 
-      // Mostrar consumos com saldo após cada transação
+      // Mostrar consumos
       if (consumptions.length > 0) {
-        message += `🛒 *CONSUMOS:*\n`
+        message += `🛒 *Consumos:*\n`
         consumptions.forEach((transaction) => {
-          const date = transaction.date.toDate().toLocaleDateString('pt-BR')
-          const time = transaction.date
-            .toDate()
-            .toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-          const balanceAfter = getBalanceAfterTransaction(transaction)
-
-          message += `🛍️ ${date} às ${time}\n`
-          message += `   💸 Valor: ${formatCurrency(Math.abs(transaction.value))}\n`
-
+          const date = transaction.date.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+          message += `${date}: ${formatCurrency(Math.abs(transaction.value))}`
+          
           if (transaction.items && transaction.items.length > 0) {
-            message += `   📦 Itens:\n`
-            transaction.items.forEach((item) => {
-              message += `      • ${item.quantity}x ${item.productName}\n`
-            })
+            const items = transaction.items.map(item => `${item.quantity}x ${item.productName}`).join(', ')
+            message += ` (${items})`
           }
-
-          message += `   💰 Saldo após compra: ${formatCurrency(balanceAfter)}\n\n`
+          message += `\n`
         })
       }
-
-      // Resumo totais
-      const totalCredits = credits.reduce((sum, t) => sum + t.value, 0)
-      const totalConsumptions = Math.abs(consumptions.reduce((sum, t) => sum + t.value, 0))
-
-      message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`
-      message += `📊 *RESUMO DO PERÍODO:*\n`
-      message += `💳 Total em recargas: ${formatCurrency(totalCredits)}\n`
-      message += `🛒 Total em consumos: ${formatCurrency(totalConsumptions)}\n`
-      message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`
     }
 
-    message += `🏫 *Cantina Digital*\n`
-    message += `📱 Sistema de gestão escolar`
-    return message
+    return message.trim()
   }
 
   // Funções para pedidos pré-pagos
