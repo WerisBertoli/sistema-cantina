@@ -402,8 +402,8 @@ export const useAppStore = defineStore('app', () => {
         saldo: newBalance,
       })
 
-      // Atualizar saldo local imediatamente
-      student.balance = newBalance
+      // Não atualizar saldo local aqui - o onSnapshot listener fará isso automaticamente
+      // para evitar duplicação visual
 
       // Criar transação
       await addDoc(collection(db, 'transactions'), {
@@ -438,8 +438,8 @@ export const useAppStore = defineStore('app', () => {
         saldo: newBalance,
       })
 
-      // Atualizar saldo local imediatamente
-      student.balance = newBalance
+      // Não atualizar saldo local aqui - o onSnapshot listener fará isso automaticamente
+      // para evitar duplicação visual
 
       // Atualizar transação
       await updateDoc(doc(db, 'transactions', transactionId), {
@@ -575,35 +575,34 @@ export const useAppStore = defineStore('app', () => {
     console.log('✅ Transação atualizada no Firestore')
 
     // Atualizar saldo do aluno usando a coleção correta 'alunos'
-    const student = students.value.find((s) => s.id === studentId)
-    if (student) {
-      const studentRef = doc(db, 'alunos', studentId)
+      const student = students.value.find((s) => s.id === studentId)
+      if (student) {
+        const studentRef = doc(db, 'alunos', studentId)
 
-      // CORREÇÃO: Se o novo valor é menor que o antigo (difference negativo),
-      // significa que removemos itens, então devemos ADICIONAR ao saldo
-      // Se o novo valor é maior (difference positivo), devemos SUBTRAIR do saldo
-      const oldValue = Math.abs(originalTransaction.value)
-      const balanceChange = -difference // Inverter o sinal da diferença
-      const newBalance = student.balance + balanceChange
+        // CORREÇÃO: Se o novo valor é menor que o antigo (difference negativo),
+        // significa que removemos itens, então devemos ADICIONAR ao saldo
+        // Se o novo valor é maior (difference positivo), devemos SUBTRAIR do saldo
+        const oldValue = Math.abs(originalTransaction.value)
+        const balanceChange = -difference // Inverter o sinal da diferença
+        const newBalance = student.balance + balanceChange
 
-      console.log('💳 Atualizando saldo do aluno:', {
-        oldValue,
-        newValue,
-        difference,
-        balanceChange,
-        currentBalance: student.balance,
-        newBalance,
-      })
+        console.log('💳 Atualizando saldo do aluno:', {
+          oldValue,
+          newValue,
+          difference,
+          balanceChange,
+          currentBalance: student.balance,
+          newBalance,
+        })
 
-      await updateDoc(studentRef, {
-        saldo: newBalance, // Usar campo 'saldo' do Firebase
-      })
-      console.log('✅ Saldo do aluno atualizado no Firestore')
+        await updateDoc(studentRef, {
+          saldo: newBalance, // Usar campo 'saldo' do Firebase
+        })
+        console.log('✅ Saldo do aluno atualizado no Firestore')
 
-      // Atualizar saldo local apenas após sucesso no Firestore
-      student.balance = newBalance
-      console.log('💰 Saldo local do estudante atualizado. Novo saldo:', student.balance)
-    }
+        // Não atualizar saldo local aqui - o onSnapshot listener fará isso automaticamente
+        // para evitar duplicação visual
+      }
   }
 
   const processConsumption = async (studentId: string) => {
