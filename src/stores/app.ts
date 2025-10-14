@@ -232,12 +232,15 @@ export const useAppStore = defineStore('app', () => {
           }) as Transaction,
       )
       console.log(`Carregadas ${transactions.value.length} transações da coleção 'transactions'`)
-      
+
       // Debug: mostrar transações por aluno
-      const transactionsByStudent = transactions.value.reduce((acc, t) => {
-        acc[t.studentId] = (acc[t.studentId] || 0) + 1
-        return acc
-      }, {} as Record<string, number>)
+      const transactionsByStudent = transactions.value.reduce(
+        (acc, t) => {
+          acc[t.studentId] = (acc[t.studentId] || 0) + 1
+          return acc
+        },
+        {} as Record<string, number>,
+      )
       console.log('Transações por aluno:', transactionsByStudent)
     })
 
@@ -258,8 +261,6 @@ export const useAppStore = defineStore('app', () => {
         `Carregados ${prepaidOrders.value.length} pedidos pré-pagos da coleção 'prepaidTransactions'`,
       )
     })
-
-
   }
 
   // const createSampleProducts = async () => {
@@ -575,34 +576,34 @@ export const useAppStore = defineStore('app', () => {
     console.log('✅ Transação atualizada no Firestore')
 
     // Atualizar saldo do aluno usando a coleção correta 'alunos'
-      const student = students.value.find((s) => s.id === studentId)
-      if (student) {
-        const studentRef = doc(db, 'alunos', studentId)
+    const student = students.value.find((s) => s.id === studentId)
+    if (student) {
+      const studentRef = doc(db, 'alunos', studentId)
 
-        // CORREÇÃO: Se o novo valor é menor que o antigo (difference negativo),
-        // significa que removemos itens, então devemos ADICIONAR ao saldo
-        // Se o novo valor é maior (difference positivo), devemos SUBTRAIR do saldo
-        const oldValue = Math.abs(originalTransaction.value)
-        const balanceChange = -difference // Inverter o sinal da diferença
-        const newBalance = student.balance + balanceChange
+      // CORREÇÃO: Se o novo valor é menor que o antigo (difference negativo),
+      // significa que removemos itens, então devemos ADICIONAR ao saldo
+      // Se o novo valor é maior (difference positivo), devemos SUBTRAIR do saldo
+      const oldValue = Math.abs(originalTransaction.value)
+      const balanceChange = -difference // Inverter o sinal da diferença
+      const newBalance = student.balance + balanceChange
 
-        console.log('💳 Atualizando saldo do aluno:', {
-          oldValue,
-          newValue,
-          difference,
-          balanceChange,
-          currentBalance: student.balance,
-          newBalance,
-        })
+      console.log('💳 Atualizando saldo do aluno:', {
+        oldValue,
+        newValue,
+        difference,
+        balanceChange,
+        currentBalance: student.balance,
+        newBalance,
+      })
 
-        await updateDoc(studentRef, {
-          saldo: newBalance, // Usar campo 'saldo' do Firebase
-        })
-        console.log('✅ Saldo do aluno atualizado no Firestore')
+      await updateDoc(studentRef, {
+        saldo: newBalance, // Usar campo 'saldo' do Firebase
+      })
+      console.log('✅ Saldo do aluno atualizado no Firestore')
 
-        // Não atualizar saldo local aqui - o onSnapshot listener fará isso automaticamente
-        // para evitar duplicação visual
-      }
+      // Não atualizar saldo local aqui - o onSnapshot listener fará isso automaticamente
+      // para evitar duplicação visual
+    }
   }
 
   const processConsumption = async (studentId: string) => {
@@ -757,7 +758,9 @@ export const useAppStore = defineStore('app', () => {
       if (credits.length > 0) {
         message += `💳 *Recargas:*\n`
         credits.forEach((transaction) => {
-          const date = transaction.date.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+          const date = transaction.date
+            .toDate()
+            .toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
           message += `${date}: ${formatCurrency(transaction.value)}\n`
         })
         message += `\n`
@@ -767,11 +770,15 @@ export const useAppStore = defineStore('app', () => {
       if (consumptions.length > 0) {
         message += `🛒 *Consumos:*\n`
         consumptions.forEach((transaction) => {
-          const date = transaction.date.toDate().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+          const date = transaction.date
+            .toDate()
+            .toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
           message += `${date}: ${formatCurrency(Math.abs(transaction.value))}`
-          
+
           if (transaction.items && transaction.items.length > 0) {
-            const items = transaction.items.map(item => `${item.quantity}x ${item.productName}`).join(', ')
+            const items = transaction.items
+              .map((item) => `${item.quantity}x ${item.productName}`)
+              .join(', ')
             message += ` (${items})`
           }
           message += `\n`

@@ -18,7 +18,7 @@
           {{ period.label }}
         </button>
       </div>
-      
+
       <!-- Seletor de Mês/Ano (aparece quando 'Mês Específico' está selecionado) -->
       <div v-if="selectedPeriod === 'custom'" class="flex flex-wrap gap-3 items-center">
         <div class="flex flex-col">
@@ -33,7 +33,7 @@
             </option>
           </select>
         </div>
-        
+
         <div class="flex flex-col">
           <label class="text-sm text-blue-100 mb-1">Ano</label>
           <select
@@ -52,9 +52,7 @@
     <!-- Cards de Ganhos -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <!-- Ganho do Período -->
-      <div
-        class="bg-white dark:bg-gray-800 p-6 border border-gray-100 dark:border-gray-700"
-      >
+      <div class="bg-white dark:bg-gray-800 p-6 border border-gray-100 dark:border-gray-700">
         <div class="flex items-start justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
@@ -83,9 +81,7 @@
       </div>
 
       <!-- Total de Transações -->
-      <div
-        class="bg-white dark:bg-gray-800 p-6 border border-gray-100 dark:border-gray-700"
-      >
+      <div class="bg-white dark:bg-gray-800 p-6 border border-gray-100 dark:border-gray-700">
         <div class="flex items-start justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Transações</p>
@@ -113,9 +109,7 @@
     </div>
 
     <!-- Histórico de Transações -->
-    <div
-      class="bg-white dark:bg-gray-800 p-6 border border-gray-100 dark:border-gray-700"
-    >
+    <div class="bg-white dark:bg-gray-800 p-6 border border-gray-100 dark:border-gray-700">
       <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
         <svg
           class="w-6 h-6 text-green-600 mr-3"
@@ -283,7 +277,7 @@ const availableYears = computed(() => {
 
 const currentPeriodLabel = computed(() => {
   if (selectedPeriod.value === 'custom') {
-    const monthName = months.find(m => m.value === selectedMonth.value)?.label || 'Janeiro'
+    const monthName = months.find((m) => m.value === selectedMonth.value)?.label || 'Janeiro'
     return `${monthName} ${selectedYear.value}`
   }
   const period = periods.find((p) => p.value === selectedPeriod.value)
@@ -309,7 +303,7 @@ const currentEarnings = computed(() => {
 const calculateCustomMonthEarnings = (): number => {
   const startDate = new Date(selectedYear.value, selectedMonth.value, 1)
   const endDate = new Date(selectedYear.value, selectedMonth.value + 1, 0, 23, 59, 59, 999)
-  
+
   return store.transactions
     .filter((t) => {
       const transactionDate = t.date.toDate()
@@ -327,7 +321,7 @@ const filteredTransactions = computed(() => {
 
   let startDate: Date
   let endDate: Date | null = null
-  
+
   switch (selectedPeriod.value) {
     case 'daily':
       startDate = startOfDay
